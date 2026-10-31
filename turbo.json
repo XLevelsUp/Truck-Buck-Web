@@ -1,0 +1,52 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "ui": "stream",
+  "globalDependencies": [".nvmrc", "pnpm-workspace.yaml"],
+  "globalEnv": ["NODE_ENV"],
+  "globalPassThroughEnv": ["CI", "GITHUB_*"],
+  "remoteCache": {
+    "signature": false
+  },
+  "tasks": {
+    "transit": {
+      "dependsOn": ["^transit"]
+    },
+    "build": {
+      "dependsOn": ["^build", "transit"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "!**/*.test.{ts,tsx}", "!e2e/**", "!coverage/**"],
+      "outputs": []
+    },
+    "lint": {
+      "dependsOn": ["transit"],
+      "inputs": ["$TURBO_DEFAULT$", "!coverage/**"]
+    },
+    "typecheck": {
+      "dependsOn": ["transit"],
+      "inputs": ["$TURBO_DEFAULT$", "!coverage/**"]
+    },
+    "test": {
+      "dependsOn": ["transit"],
+      "inputs": ["$TURBO_DEFAULT$", "!e2e/**", "!coverage/**"],
+      "outputs": ["coverage/**"]
+    },
+    "test:e2e": {
+      "dependsOn": ["build"],
+      "inputs": ["$TURBO_DEFAULT$", "!coverage/**"],
+      "outputs": ["playwright-report/**", "test-results/**"],
+      "passThroughEnv": ["PLAYWRIGHT_*"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "//#lint:deps": {
+      "inputs": [
+        ".dependency-cruiser.cjs",
+        "apps/*/package.json",
+        "apps/*/src/**",
+        "packages/*/package.json",
+        "packages/*/src/**"
+      ]
+    }
+  }
+}

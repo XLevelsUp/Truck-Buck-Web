@@ -1,0 +1,8 @@
+pnpm-lock.yaml
+**/.next/
+**/dist/
+**/coverage/
+**/.turbo/
+**/playwright-report/
+**/test-results/
+**/next-env.d.ts
