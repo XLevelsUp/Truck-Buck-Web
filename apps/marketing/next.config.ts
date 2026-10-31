@@ -8,8 +8,11 @@ import type { NextConfig } from "next";
 import { securityHeaders } from "./src/lib/security-headers.ts";
 
 const nextConfig: NextConfig = {
-  // Self-contained server bundle for the Docker image.
-  output: "standalone",
+  // Self-contained server bundle, built only for the Docker image (the
+  // Dockerfile sets BUILD_STANDALONE=1). Elsewhere a regular .next is smaller
+  // to cache and restores cleanly from the Turborepo cache — standalone output
+  // contains a copied node_modules with symlinks.
+  ...(process.env.BUILD_STANDALONE === "1" ? { output: "standalone" as const } : {}),
   // Trace files from the monorepo root so workspace packages are included.
   outputFileTracingRoot: join(import.meta.dirname, "../.."),
   reactStrictMode: true,

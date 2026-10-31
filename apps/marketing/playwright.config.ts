@@ -14,7 +14,7 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
-  // Runs against the production build (turbo runs `build` first).
+  // Runs against the production build via `next start` (turbo runs `build` first).
   webServer: {
     command: "pnpm start",
     url: `http://localhost:${PORT}`,

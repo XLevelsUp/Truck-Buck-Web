@@ -33,7 +33,8 @@ COPY --from=pruner /repo/out/full/ .
 ARG NEXT_PUBLIC_SITE_URL
 ARG NEXT_PUBLIC_PLAY_STORE_URL
 ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL \
-    NEXT_PUBLIC_PLAY_STORE_URL=$NEXT_PUBLIC_PLAY_STORE_URL
+    NEXT_PUBLIC_PLAY_STORE_URL=$NEXT_PUBLIC_PLAY_STORE_URL \
+    BUILD_STANDALONE=1
 RUN pnpm turbo run build --filter=@truckbuck/marketing
 
 # 3. Minimal runtime: standalone server only, non-root.

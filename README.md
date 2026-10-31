@@ -121,6 +121,8 @@ docker run --rm -p 8080:8080 truckbuck/admin
 ```
 
 - **marketing**: Next.js `output: "standalone"` server on Node 26 Alpine, non-root user.
+  Standalone output is enabled only when `BUILD_STANDALONE=1` (the Dockerfile sets it);
+  local/CI builds produce a regular `.next`, which caches and restores cleanly in Turborepo.
 - **admin**: static files on nginx with SPA fallback, long-cache hashed assets, `/healthz`.
 
 Public env values are build args, so build one image per environment.

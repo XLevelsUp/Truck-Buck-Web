@@ -4,7 +4,7 @@
   "tasks": {
     "build": {
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"],
-      "env": ["NEXT_PUBLIC_*"]
+      "env": ["NEXT_PUBLIC_*", "BUILD_STANDALONE"]
     },
     "typecheck": {
       "env": ["NEXT_PUBLIC_*"]
@@ -13,8 +13,7 @@
       "passThroughEnv": ["NEXT_PUBLIC_*"]
     },
     "test:e2e": {
-      "env": ["NEXT_PUBLIC_*"],
-      "passThroughEnv": ["PORT"]
+      "env": ["NEXT_PUBLIC_*"]
     }
   }
 }
