@@ -1,0 +1,24 @@
+{
+  "name": "@truckbuck/api-client",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Typed fetch wrapper: base URL, auth token, X-Client-Id tenant header, normalised errors.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@truckbuck/config-eslint": "workspace:*",
+    "@truckbuck/config-typescript": "workspace:*",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

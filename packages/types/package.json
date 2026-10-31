@@ -1,0 +1,27 @@
+{
+  "name": "@truckbuck/types",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Shared domain types and Zod schemas. Runtime dependency: zod only.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --coverage"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@truckbuck/config-eslint": "workspace:*",
+    "@truckbuck/config-typescript": "workspace:*",
+    "@vitest/coverage-v8": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
