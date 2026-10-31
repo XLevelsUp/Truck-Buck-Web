@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@truckbuck/ui/styles.css";
+
+/* Wire next/font into the shared theme's font token. */
+:root {
+  --tb-font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+}
