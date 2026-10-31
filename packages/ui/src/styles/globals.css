@@ -1,0 +1,146 @@
+/*
+ * TruckBuck design tokens + base styles (Tailwind CSS v4).
+ *
+ * Tailwind v4 has no JS presets: this stylesheet IS the shared preset.
+ * Each app imports it right after Tailwind:
+ *
+ *   @import "tailwindcss";
+ *   @import "@truckbuck/ui/styles.css";
+ *
+ * Tokens are defined once here as CSS variables and exposed to Tailwind via
+ * @theme, so `bg-primary`, `rounded-lg`, `font-sans` etc. mean the same thing
+ * in every app.
+ */
+
+/* Scan this package's components so their classes are generated in every
+   consuming app. Paths are relative to this file, so it works from anywhere. */
+@source "../components";
+@source "../lib";
+
+:root {
+  /* Brand: deep road-blue for trust, amber for action/attention. */
+  --tb-background: oklch(0.99 0.003 250);
+  --tb-foreground: oklch(0.2 0.03 260);
+  --tb-card: oklch(1 0 0);
+  --tb-card-foreground: var(--tb-foreground);
+  --tb-muted: oklch(0.96 0.008 255);
+  --tb-muted-foreground: oklch(0.45 0.03 260);
+  --tb-primary: oklch(0.4 0.14 262);
+  --tb-primary-foreground: oklch(0.99 0 0);
+  --tb-secondary: oklch(0.94 0.015 255);
+  --tb-secondary-foreground: oklch(0.25 0.05 262);
+  --tb-accent: oklch(0.8 0.15 75);
+  --tb-accent-foreground: oklch(0.22 0.05 60);
+  --tb-destructive: oklch(0.55 0.21 27);
+  --tb-destructive-foreground: oklch(0.99 0 0);
+  --tb-success: oklch(0.52 0.13 155);
+  --tb-success-foreground: oklch(0.99 0 0);
+  --tb-warning: oklch(0.78 0.15 80);
+  --tb-warning-foreground: oklch(0.25 0.05 60);
+  --tb-border: oklch(0.9 0.01 255);
+  --tb-input: oklch(0.86 0.012 255);
+  --tb-ring: oklch(0.55 0.16 262);
+  --tb-overlay: oklch(0.15 0.02 260 / 0.55);
+  --tb-radius: 0.625rem;
+}
+
+@theme inline {
+  /* Colors */
+  --color-background: var(--tb-background);
+  --color-foreground: var(--tb-foreground);
+  --color-card: var(--tb-card);
+  --color-card-foreground: var(--tb-card-foreground);
+  --color-muted: var(--tb-muted);
+  --color-muted-foreground: var(--tb-muted-foreground);
+  --color-primary: var(--tb-primary);
+  --color-primary-foreground: var(--tb-primary-foreground);
+  --color-secondary: var(--tb-secondary);
+  --color-secondary-foreground: var(--tb-secondary-foreground);
+  --color-accent: var(--tb-accent);
+  --color-accent-foreground: var(--tb-accent-foreground);
+  --color-destructive: var(--tb-destructive);
+  --color-destructive-foreground: var(--tb-destructive-foreground);
+  --color-success: var(--tb-success);
+  --color-success-foreground: var(--tb-success-foreground);
+  --color-warning: var(--tb-warning);
+  --color-warning-foreground: var(--tb-warning-foreground);
+  --color-border: var(--tb-border);
+  --color-input: var(--tb-input);
+  --color-ring: var(--tb-ring);
+  --color-overlay: var(--tb-overlay);
+
+  /* Radius */
+  --radius-sm: calc(var(--tb-radius) - 4px);
+  --radius-md: calc(var(--tb-radius) - 2px);
+  --radius-lg: var(--tb-radius);
+  --radius-xl: calc(var(--tb-radius) + 4px);
+
+  /* Typography — apps supply the actual font via --tb-font-sans (next/font
+     in marketing, system stack in admin). */
+  --font-sans: var(--tb-font-sans, ui-sans-serif, system-ui, sans-serif);
+  --text-display: 3.5rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.03em;
+
+  /* Spacing scale base (Tailwind default made explicit) and layout widths */
+  --spacing: 0.25rem;
+  --container-content: 72rem;
+  --container-prose: 68ch;
+
+  /* Motion */
+  --animate-fade-in: tb-fade-in 150ms ease-out;
+  --animate-fade-out: tb-fade-out 150ms ease-in;
+  --animate-zoom-in: tb-zoom-in 150ms ease-out;
+  --animate-slide-in: tb-slide-in 200ms ease-out;
+}
+
+@keyframes tb-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes tb-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes tb-zoom-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.96);
+  }
+}
+@keyframes tb-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::after,
+    ::before {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
