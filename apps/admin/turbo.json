@@ -1,0 +1,16 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "outputs": ["dist/**"],
+      "env": ["VITE_*"]
+    },
+    "dev": {
+      "passThroughEnv": ["VITE_*"]
+    },
+    "test:e2e": {
+      "env": ["VITE_*"]
+    }
+  }
+}

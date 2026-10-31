@@ -1,0 +1,11 @@
+{
+  "extends": "@truckbuck/config-typescript/vite.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "types": ["vite/client", "@testing-library/jest-dom/vitest"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src", "e2e", "*.config.ts"]
+}
