@@ -11,10 +11,19 @@ import { z } from "zod";
  * `env.server.ts` that starts with `import "server-only"`, so importing it
  * from a Client Component fails the build instead of leaking the value.
  */
+function message(expected: string) {
+  return (issue: { input?: unknown }) =>
+    issue.input === undefined || issue.input === ""
+      ? "Required, but not set"
+      : `${expected} (got ${JSON.stringify(issue.input)})`;
+}
+
 const schema = z.object({
-  NEXT_PUBLIC_SITE_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, "")),
+  NEXT_PUBLIC_SITE_URL: z
+    .url({ protocol: /^https?$/, error: message("Must be an http(s) URL") })
+    .transform((url) => url.replace(/\/+$/, "")),
   NEXT_PUBLIC_PLAY_STORE_URL: z
-    .url({ protocol: /^https$/ })
+    .url({ protocol: /^https$/, error: message("Must be an https URL") })
     .refine((url) => url.startsWith("https://play.google.com/"), {
       message: "Must be a https://play.google.com/ listing URL",
     }),
