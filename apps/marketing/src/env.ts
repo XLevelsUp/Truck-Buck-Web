@@ -29,9 +29,23 @@ const schema = z.object({
     }),
 });
 
+/**
+ * On Vercel, NEXT_PUBLIC_SITE_URL may be left unset: production falls back to
+ * the project's production domain, previews to their own branch/deployment
+ * URL (so a preview never claims production as its canonical origin).
+ * Only server code reads `env`, where the VERCEL_* system variables exist.
+ */
+function vercelSiteUrl(): string | undefined {
+  const host =
+    process.env.VERCEL_ENV === "production"
+      ? process.env.VERCEL_PROJECT_PRODUCTION_URL
+      : (process.env.VERCEL_BRANCH_URL ?? process.env.VERCEL_URL);
+  return host ? `https://${host}` : undefined;
+}
+
 // Each variable is referenced literally so Next.js can inline it.
 const parsed = schema.safeParse({
-  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || vercelSiteUrl(),
   NEXT_PUBLIC_PLAY_STORE_URL: process.env.NEXT_PUBLIC_PLAY_STORE_URL,
 });
 

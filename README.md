@@ -93,6 +93,11 @@ readable error if something is missing or malformed.
 | admin     | `VITE_API_BASE_URL`          | yes      | `https://api.truckbuck.in/v1`                                       | Base URL for `@truckbuck/api-client`            |
 | admin     | `VITE_APP_ENV`               | yes      | `development` \| `test` \| `staging` \| `production`                | Environment label (badge in the top bar)        |
 
+On Vercel, `NEXT_PUBLIC_SITE_URL` can be left unset: production builds fall back to the
+project's production domain and previews to their own URL. Set it (Production scope only)
+once a custom domain is attached. `NEXT_PUBLIC_PLAY_STORE_URL` must always be set in the
+Vercel project's Environment Variables.
+
 All four are **public** — they are inlined into browser bundles at build time. Never put
 secrets in `NEXT_PUBLIC_*` or `VITE_*`. Server-only secrets for marketing go in a separate
 `src/env.server.ts` starting with `import "server-only"`.

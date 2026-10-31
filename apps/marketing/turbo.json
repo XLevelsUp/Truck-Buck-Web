@@ -4,7 +4,14 @@
   "tasks": {
     "build": {
       "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**"],
-      "env": ["NEXT_PUBLIC_*", "BUILD_STANDALONE"]
+      "env": [
+        "NEXT_PUBLIC_*",
+        "BUILD_STANDALONE",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+        "VERCEL_BRANCH_URL",
+        "VERCEL_PROJECT_PRODUCTION_URL"
+      ]
     },
     "typecheck": {
       "env": ["NEXT_PUBLIC_*"]
