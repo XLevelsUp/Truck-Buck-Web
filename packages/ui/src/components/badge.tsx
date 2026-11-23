@@ -3,20 +3,26 @@ import type { ComponentProps } from "react";
 
 import { cn } from "../lib/utils";
 
+/**
+ * Non-interactive status label ("Verified", "In transit", "New").
+ * Never rely on colour alone: the text must carry the meaning.
+ */
 export const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium whitespace-nowrap",
+  "inline-flex w-fit shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs leading-5 font-semibold whitespace-nowrap [&_svg]:size-3.5",
   {
     variants: {
       variant: {
-        default: "border-transparent bg-primary text-primary-foreground",
-        secondary: "border-transparent bg-secondary text-secondary-foreground",
-        success: "border-transparent bg-success text-success-foreground",
-        warning: "border-transparent bg-warning text-warning-foreground",
-        destructive: "border-transparent bg-destructive text-destructive-foreground",
-        outline: "text-foreground",
+        neutral: "bg-surface-muted text-foreground ring-1 ring-border ring-inset",
+        brand: "bg-primary-soft text-primary-soft-foreground",
+        success: "bg-success-soft text-success-soft-foreground",
+        warning: "bg-warning-soft text-warning-soft-foreground",
+        danger: "bg-danger-soft text-danger-soft-foreground",
+        info: "bg-info-soft text-info-soft-foreground",
+        /** Solid amber: reserve for "New" / promo moments. */
+        accent: "bg-accent text-accent-foreground",
       },
     },
-    defaultVariants: { variant: "default" },
+    defaultVariants: { variant: "neutral" },
   },
 );
 

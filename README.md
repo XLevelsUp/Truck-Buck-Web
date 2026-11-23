@@ -39,7 +39,7 @@ affected work re-runs.
 | `pnpm dev`                              | Both apps in watch mode (marketing :3000, admin :5173).              |
 | `pnpm dev:marketing` / `pnpm dev:admin` | One app only.                                                        |
 | `pnpm build`                            | Production builds of every app.                                      |
-| `pnpm lint`                             | ESLint in every workspace + dependency-cruiser architecture rules.   |
+| `pnpm lint`                             | ESLint, dependency-cruiser rules and the raw-colour check (CSS).     |
 | `pnpm typecheck`                        | `tsc --noEmit` in every workspace.                                   |
 | `pnpm test`                             | Vitest unit/component tests with coverage (`<workspace>/coverage/`). |
 | `pnpm test:e2e`                         | Playwright smoke tests against production builds (builds first).     |
@@ -59,13 +59,13 @@ apps/
   marketing/          Next.js 16 (App Router, RSC). Public site: home, privacy, terms, 404, SEO.
   admin/              React 19 + Vite SPA. React Router data router, TanStack Query, RHF + Zod.
 packages/
-  ui/                 Shared components (Radix + cva) and the Tailwind v4 theme (design tokens).
+  ui/                 Design system: tokens (light + dark), Tailwind v4 preset, components, logo, icons.
   types/              Domain types + Zod schemas (Booking, Trip, Transporter, Tenant). Depends on zod only.
   api-client/         Typed fetch wrapper: base URL, bearer token, X-Client-Id tenant header, ApiError.
   utils/              Pure helpers: formatINR (paise), IST dates, +91 mobile numbers. No dependencies.
   config-typescript/  tsconfig presets: base, nextjs, vite, react-library.
   config-eslint/      ESLint flat configs: base, library, react, next.
-docs/adr/             Architecture decision records.
+docs/                 Blueprint, design system, voice & tone, ADRs.
 .github/workflows/    CI.
 ```
 
@@ -152,6 +152,13 @@ Public env values are build args, so build one image per environment.
 
 For `apps/api` (NestJS) specifically, see "Consequences" in ADR 0001.
 
+## Design system
+
+Tokens, components and brand rules: [docs/design-system.md](docs/design-system.md); copy rules:
+[docs/voice-and-tone.md](docs/voice-and-tone.md). Live reference at `/styleguide` on the marketing
+app. Colours exist only in `packages/ui/src/tokens/tokens.ts` (lint fails elsewhere); after
+editing it run `pnpm --filter @truckbuck/ui tokens`.
+
 ## Conventions
 
 **Naming**
@@ -195,5 +202,5 @@ The marketing site is structured so adding `next-intl` needs no route rewrite:
 - Marketing CSP allows `'unsafe-inline'` scripts (needed for static App Router pages); see
   `src/lib/security-headers.ts` for the path to nonces or SRI hashes.
 - Admin `VITE_*` config is baked in at build time (one image per environment).
-- No dark mode yet (tokens are CSS variables, so it's a theme override in `packages/ui`).
+- Admin is pinned to the light theme (`data-theme="light"` in `index.html`) until its screens are reviewed in dark.
 - No coverage thresholds yet (reports are generated and uploaded by CI).

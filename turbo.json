@@ -47,6 +47,9 @@
         "packages/*/package.json",
         "packages/*/src/**"
       ]
+    },
+    "//#lint:colors": {
+      "inputs": ["scripts/check-raw-colors.mjs", "apps/*/src/**/*.css", "packages/*/src/**/*.css"]
     }
   }
 }

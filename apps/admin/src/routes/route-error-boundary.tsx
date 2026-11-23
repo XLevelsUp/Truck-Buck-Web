@@ -21,7 +21,7 @@ export function RouteErrorBoundary() {
     <div role="alert" className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center gap-4 p-6">
       <h1 className="text-2xl font-bold">{title}</h1>
       {import.meta.env.DEV && detail ? (
-        <pre className="overflow-auto rounded-md bg-muted p-3 text-xs">{detail}</pre>
+        <pre className="overflow-auto rounded-md bg-surface-muted p-3 text-xs">{detail}</pre>
       ) : (
         <p className="text-muted-foreground">
           Please try again. If it keeps happening, contact support.
@@ -29,7 +29,7 @@ export function RouteErrorBoundary() {
       )}
       <div className="flex gap-2">
         <Button onClick={() => window.location.reload()}>Reload</Button>
-        <Button asChild variant="outline">
+        <Button asChild variant="secondary">
           <Link to="/">Go to dashboard</Link>
         </Button>
       </div>

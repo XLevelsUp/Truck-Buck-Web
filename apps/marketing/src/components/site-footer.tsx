@@ -6,8 +6,8 @@ import { routes } from "@/lib/routes";
 export function SiteFooter() {
   const content = getContent();
   return (
-    <footer className="border-t bg-card">
-      <div className="mx-auto flex max-w-(--container-content) flex-col gap-4 px-4 py-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <footer className="border-t bg-surface">
+      <div className="mx-auto flex max-w-(--container-content) flex-col gap-4 px-4 py-8 text-sm text-muted-foreground md:flex-row md:items-center md:justify-between md:px-6">
         <p>
           © {content.site.name}. {content.footer.rights}
         </p>

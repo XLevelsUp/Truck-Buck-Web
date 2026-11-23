@@ -1,7 +1,9 @@
 @import "tailwindcss";
 @import "@truckbuck/ui/styles.css";
 
-/* Wire next/font into the shared theme's font token. */
+/* Wire next/font faces into the design-system font stack (see tokens.ts). */
 :root {
-  --tb-font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --tb-font-sans-face: var(--font-geist-sans);
+  --tb-font-devanagari: var(--font-noto-devanagari);
+  --tb-font-tamil: var(--font-noto-tamil);
 }

@@ -13,12 +13,14 @@
   },
   "dependencies": {
     "@truckbuck/ui": "workspace:*",
+    "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
+    "@axe-core/playwright": "catalog:",
     "@playwright/test": "catalog:",
     "@tailwindcss/turbopack": "catalog:",
     "@truckbuck/config-eslint": "workspace:*",

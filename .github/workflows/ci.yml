@@ -49,11 +49,11 @@ jobs:
       # main: everything — remote cache makes unchanged tasks instant.
       - name: Turbo (affected)
         if: github.event_name == 'pull_request'
-        run: pnpm turbo run lint lint:deps typecheck test build --affected
+        run: pnpm turbo run lint lint:deps lint:colors typecheck test build --affected
 
       - name: Turbo (all)
         if: github.event_name != 'pull_request'
-        run: pnpm turbo run lint lint:deps typecheck test build
+        run: pnpm turbo run lint lint:deps lint:colors typecheck test build
 
       - name: Format check
         run: pnpm format:check

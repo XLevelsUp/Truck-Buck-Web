@@ -16,9 +16,9 @@ export default function HomePage() {
   const { home } = getContent();
   return (
     <>
-      <section className="mx-auto max-w-(--container-content) px-4 py-20 sm:px-6 sm:py-28">
+      <section className="mx-auto max-w-(--container-content) px-4 py-20 md:px-6 md:py-28">
         <p className="text-sm font-semibold tracking-wide text-primary uppercase">{home.eyebrow}</p>
-        <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight sm:text-display">
+        <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight md:text-display">
           {home.title}
         </h1>
         <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">{home.lead}</p>
@@ -28,15 +28,15 @@ export default function HomePage() {
               {home.primaryCta}
             </a>
           </Button>
-          <Button asChild size="lg" variant="outline">
+          <Button asChild size="lg" variant="secondary">
             <a href="#how-it-works">{home.secondaryCta}</a>
           </Button>
         </div>
       </section>
 
-      <section aria-labelledby="features" className="border-y bg-muted">
-        <div className="mx-auto max-w-(--container-content) px-4 py-16 sm:px-6">
-          <h2 id="features" className="text-2xl font-bold tracking-tight sm:text-3xl">
+      <section aria-labelledby="features" className="border-y bg-surface-muted">
+        <div className="mx-auto max-w-(--container-content) px-4 py-16 md:px-6">
+          <h2 id="features" className="text-2xl font-bold tracking-tight md:text-3xl">
             {home.featuresTitle}
           </h2>
           <ul className="mt-8 grid gap-6 md:grid-cols-3">
@@ -59,14 +59,14 @@ export default function HomePage() {
       <section
         id="how-it-works"
         aria-labelledby="how-it-works-title"
-        className="mx-auto max-w-(--container-content) scroll-mt-8 px-4 py-16 sm:px-6"
+        className="mx-auto max-w-(--container-content) scroll-mt-8 px-4 py-16 md:px-6"
       >
-        <h2 id="how-it-works-title" className="text-2xl font-bold tracking-tight sm:text-3xl">
+        <h2 id="how-it-works-title" className="text-2xl font-bold tracking-tight md:text-3xl">
           {home.stepsTitle}
         </h2>
         <ol className="mt-8 grid gap-4 md:grid-cols-3">
           {home.steps.map((step, index) => (
-            <li key={step} className="flex gap-4 rounded-lg border bg-card p-5">
+            <li key={step} className="flex gap-4 rounded-lg border bg-surface p-5">
               <span
                 aria-hidden="true"
                 className="grid size-8 shrink-0 place-items-center rounded-full bg-primary text-sm font-semibold text-primary-foreground"

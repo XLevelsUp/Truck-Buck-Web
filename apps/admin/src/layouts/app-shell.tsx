@@ -15,7 +15,7 @@ export function AppShell() {
       <Sidebar />
       <div className="flex min-w-0 flex-col">
         <TopBar />
-        <main id="main" className="flex-1 p-4 sm:p-6">
+        <main id="main" className="flex-1 p-4 md:p-6">
           <Outlet />
         </main>
       </div>
@@ -25,7 +25,7 @@ export function AppShell() {
 
 function Sidebar() {
   return (
-    <aside className="border-b bg-card md:border-r md:border-b-0">
+    <aside className="border-b bg-surface md:border-r md:border-b-0">
       <div className="flex h-14 items-center gap-2 border-b px-4 font-bold">
         <span
           aria-hidden="true"
@@ -44,8 +44,8 @@ function Sidebar() {
                 end={"end" in item ? item.end : false}
                 className={({ isActive }) =>
                   cn(
-                    "block rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                    isActive && "bg-secondary text-secondary-foreground",
+                    "block rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors hover:bg-surface-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+                    isActive && "bg-primary-soft text-primary-soft-foreground",
                   )
                 }
               >
@@ -64,14 +64,14 @@ function TopBar() {
   const { clientId, tenants, setClientId } = useTenant();
 
   return (
-    <header className="flex h-14 items-center justify-between gap-4 border-b bg-card px-4 sm:px-6">
+    <header className="flex h-14 items-center justify-between gap-4 border-b bg-surface px-4 md:px-6">
       <div className="flex items-center gap-2">
         <label htmlFor="tenant" className="text-sm text-muted-foreground">
           Tenant
         </label>
         <select
           id="tenant"
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-md border border-border-strong bg-background px-2 text-sm"
           value={clientId ?? ""}
           onChange={(event) => {
             const next = tenants.find((tenant) => tenant.clientId === event.target.value);
@@ -89,8 +89,8 @@ function TopBar() {
         )}
       </div>
       <div className="flex items-center gap-3">
-        <span className="hidden text-sm sm:inline">{session?.user.name}</span>
-        <Button variant="outline" size="sm" onClick={() => void signOut()}>
+        <span className="hidden text-sm md:inline">{session?.user.name}</span>
+        <Button variant="secondary" size="sm" onClick={() => void signOut()}>
           Sign out
         </Button>
       </div>

@@ -7,6 +7,16 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import turbo from "eslint-plugin-turbo";
 import tseslint from "typescript-eslint";
 
+// `#abc`, `#abcd`, `#aabbcc`, `#aabbccdd` not followed by more word characters
+// (so `#main` or `#get-price` anchors don't match), and CSS colour functions.
+const RAW_COLOR =
+  "/(^|[^\\w&])#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})(?![\\w-])|\\b(rgba?|hsla?|hwb|oklab|oklch|lab|lch)\\(/";
+const rawColorSelectors = [
+  `Literal[value=${RAW_COLOR}]`,
+  `TemplateElement[value.raw=${RAW_COLOR}]`,
+  `JSXText[value=${RAW_COLOR}]`,
+];
+
 export const base = defineConfig(
   globalIgnores([
     "**/node_modules/",
@@ -74,6 +84,25 @@ export const base = defineConfig(
       ],
       "simple-import-sort/exports": "error",
     },
+  },
+  {
+    // Design tokens are the only source of colour. A raw hex or rgb()/oklch()
+    // value in code bypasses theming and contrast checks. Exempt: the token
+    // source itself (packages/ui/src/tokens/), via the override below.
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        ...rawColorSelectors.map((selector) => ({
+          selector,
+          message:
+            "Raw colour value. Use a design token: a Tailwind class (bg-primary), var(--tb-<role>), or `themes` from @truckbuck/ui/tokens. Add new colours to packages/ui/src/tokens/tokens.ts.",
+        })),
+      ],
+    },
+  },
+  {
+    files: ["**/src/tokens/**"],
+    rules: { "no-restricted-syntax": "off" },
   },
   {
     // Plain JS config files are not part of any tsconfig; lint them untyped.

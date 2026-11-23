@@ -32,7 +32,7 @@ export function TableFooter({ className, ...props }: ComponentProps<"tfoot">) {
   return (
     <tfoot
       data-slot="table-footer"
-      className={cn("border-t bg-muted/50 font-medium", className)}
+      className={cn("border-t bg-surface-muted/50 font-medium", className)}
       {...props}
     />
   );
@@ -43,7 +43,7 @@ export function TableRow({ className, ...props }: ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b transition-colors hover:bg-surface-muted/50 data-[state=selected]:bg-surface-muted",
         className,
       )}
       {...props}

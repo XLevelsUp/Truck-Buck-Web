@@ -20,7 +20,8 @@
       "passThroughEnv": ["NEXT_PUBLIC_*"]
     },
     "test:e2e": {
-      "env": ["NEXT_PUBLIC_*"]
+      "env": ["NEXT_PUBLIC_*"],
+      "passThroughEnv": ["E2E_PORT"]
     }
   }
 }

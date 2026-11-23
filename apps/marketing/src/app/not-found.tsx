@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <section className="mx-auto flex max-w-(--container-prose) flex-col items-start px-4 py-24 sm:px-6">
+    <section className="mx-auto flex max-w-(--container-prose) flex-col items-start px-4 py-24 md:px-6">
       <p className="text-sm font-semibold text-primary">404</p>
-      <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{notFound.title}</h1>
+      <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">{notFound.title}</h1>
       <p className="mt-4 text-muted-foreground">{notFound.body}</p>
       <Button asChild className="mt-8">
         <Link href={routes.home.path}>{notFound.cta}</Link>

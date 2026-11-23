@@ -6,3 +6,5 @@ pnpm-lock.yaml
 **/playwright-report/
 **/test-results/
 **/next-env.d.ts
+# Generated from packages/ui/src/tokens/tokens.ts
+packages/ui/src/styles/tokens.css

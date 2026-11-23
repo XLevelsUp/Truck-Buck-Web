@@ -50,12 +50,12 @@ export function LoginPage() {
       await signIn(values);
       await navigate(target, { replace: true });
     } catch {
-      toast({ title: "Sign-in failed", description: "Please try again.", variant: "destructive" });
+      toast({ title: "Sign-in failed", description: "Please try again.", variant: "danger" });
     }
   });
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-muted p-4">
+    <main className="grid min-h-dvh place-items-center bg-surface-muted p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <h1 className="text-xl leading-none font-semibold tracking-tight">
@@ -76,7 +76,7 @@ export function LoginPage() {
                 {...register("email")}
               />
               {errors.email ? (
-                <p id="email-error" className="text-sm text-destructive">
+                <p id="email-error" className="text-sm text-danger">
                   {errors.email.message}
                 </p>
               ) : null}
@@ -92,7 +92,7 @@ export function LoginPage() {
                 {...register("password")}
               />
               {errors.password ? (
-                <p id="password-error" className="text-sm text-destructive">
+                <p id="password-error" className="text-sm text-danger">
                   {errors.password.message}
                 </p>
               ) : null}

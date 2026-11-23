@@ -8,7 +8,7 @@ export function NotFoundPage() {
   return (
     <div>
       <PageHeader title="Page not found" description="This page does not exist or has moved." />
-      <Button asChild variant="outline">
+      <Button asChild variant="secondary">
         <Link to="/">Back to dashboard</Link>
       </Button>
     </div>

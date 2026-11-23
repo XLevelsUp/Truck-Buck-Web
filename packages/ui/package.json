@@ -9,17 +9,23 @@
   ],
   "exports": {
     "./styles.css": "./src/styles/globals.css",
+    "./tokens": "./src/tokens/tokens.ts",
+    "./contrast": "./src/tokens/contrast.ts",
+    "./brand/logo-geometry": "./src/brand/logo-geometry.ts",
     "./lib/utils": "./src/lib/utils.ts",
     "./*": "./src/components/*.tsx"
   },
   "scripts": {
+    "tokens": "node scripts/generate-tokens.ts",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage"
   },
   "dependencies": {
+    "@truckbuck/utils": "workspace:*",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
+    "lucide-react": "catalog:",
     "radix-ui": "catalog:",
     "tailwind-merge": "catalog:"
   },
@@ -34,6 +40,7 @@
     "@testing-library/user-event": "catalog:",
     "@truckbuck/config-eslint": "workspace:*",
     "@truckbuck/config-typescript": "workspace:*",
+    "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",

@@ -1,7 +1,8 @@
 {
   "extends": "@truckbuck/config-typescript/react-library.json",
   "compilerOptions": {
-    "types": ["@testing-library/jest-dom/vitest"]
+    "allowImportingTsExtensions": true,
+    "types": ["@testing-library/jest-dom/vitest", "node"]
   },
-  "include": ["src", "*.config.ts"]
+  "include": ["src", "scripts", "*.config.ts"]
 }

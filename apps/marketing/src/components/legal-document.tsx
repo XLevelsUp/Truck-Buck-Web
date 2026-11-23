@@ -9,8 +9,8 @@ interface LegalDocumentProps {
 export function LegalDocument({ title, lastUpdated, sections }: LegalDocumentProps) {
   const { legal } = getContent();
   return (
-    <article className="mx-auto max-w-(--container-prose) px-4 py-12 sm:px-6 sm:py-16">
-      <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{title}</h1>
+    <article className="mx-auto max-w-(--container-prose) px-4 py-12 md:px-6 md:py-16">
+      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         {legal.lastUpdatedLabel}: <time dateTime={lastUpdated}>{lastUpdated}</time>
       </p>
