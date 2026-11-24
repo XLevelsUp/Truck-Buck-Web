@@ -37,6 +37,14 @@ Last reviewed: 2026-11-24.
 | Fare depends on road distance, truck type and pickup time; night and same-day pickups can cost more.                                          | Home FAQ, estimate result                      | By construction: `priceQuote` in `packages/pricing`. The rates themselves are samples (NFC-2).                                                |
 | The quoted fare is a range, and the final fare is agreed before booking.                                                                      | Home FAQ, estimate result                      | By construction: the range is rounded outward. The final-fare process is NFC-13.                                                              |
 | Truck types run "from mini trucks to large containers".                                                                                       | Home trucks section, `/trucks`                 | Generic on purpose. The real catalogue is NFC-1, and sample rows are dev-only.                                                                |
+| If a transporter doesn't accept, the load is offered to the next vetted transporter.                                                          | `/how-it-works` FAQ, `/help`                   | Phase 4 brief lifecycle: "offer to vetted transporter -> accept or cascade".                                                                  |
+| Vetting checks RC, insurance and permit for every truck, and each driver's licence (`vetVehicleDocs`, `vetDriverLicence`).                    | `/safety` steps 2–3, `/help`                   | Phase 4 brief: "documents needed (RC, insurance, permit, PAN, GST optional, bank details, driver licence)".                                   |
+| Digital KYC (PAN + Aadhaar via DigiLocker/Setu) is "Coming soon"; today the owner's PAN is checked with the other documents (`vetKyc`).       | `/safety` step 1                               | Phase 6 brief: "mark as planned if not integrated". PAN is in the Phase 4 document list.                                                      |
+| Driver rewards will be weighted on safety (`safetyWeightedRewards`, "Coming soon"); non-cash (fuel, recharge).                                | `/safety`, `/drivers`, `/help`                 | Master brief: "later, safety-weighted non-cash driver rewards"; Phase 4 brief: "non-cash (fuel, recharge)". Wording approval is NFC-17.       |
+| Mission: "Make full-truck booking simple and fair for shippers, transporters and drivers."                                                    | `/about`                                       | Restates the brief's positioning lines for each audience. Not a factual claim.                                                                |
+| GST is included in the estimate range; the website takes no payments; estimates and callbacks are free.                                       | `/help`, `/refund-policy`                      | By construction: `priceQuote` adds GST; the site has no payment flow.                                                                         |
+| Data requests (access, correction, erasure) and complaints can be filed online.                                                               | `/grievance`, `/help`, `/privacy`              | By construction: the grievance form files `grievance` / `account_deletion` leads.                                                             |
+| We use only a language cookie and Cloudflare Turnstile's security cookies; no advertising or analytics cookies.                               | `/privacy` (draft)                             | By construction, as of 2026-11-24. Re-check when analytics ship (Phase 9); a consent banner is needed only for non-essential cookies.         |
 
 ## Gated until confirmed
 
@@ -58,7 +66,16 @@ Last reviewed: 2026-11-24.
 | Legal name, CIN, GSTIN and registered office               | `company.*`                                                        | NFC-4                                     |
 | Waiting, cancellation and payment terms on `/pricing`      | `site_config` `charges`                                            | NFC-2, NFC-11                             |
 | Cities and lanes served (coverage map)                     | Supabase `cities` / `lanes` (sample rows are dev-only)             | NFC-3                                     |
-| Testimonials and client logos                              | Render nothing while empty                                         | NFC-9, NFC-10                             |
+| Testimonials and client logos                              | DB: `published` + consent/permission + `approved_by`/`approved_at` | NFC-9, NFC-10                             |
+| Live counters (trips completed, transporters onboarded)    | `site_metrics` (real counts only) + `metrics.thresholds`           | NFC-11 (whether to publish numbers)       |
+| First-trip review; auto-suspension below a rating          | `vetFirstTrip`, `vetRatingThreshold`, `company.suspendBelowRating` | NFC-5                                     |
+| Incident process; insurance guidance                       | `incidentProcess`, `insuranceGuidance`                             | NFC-11, NFC-13                            |
+| No speed-based incentives; planned rest stops              | `noSpeedIncentives`, `restStopPolicy`                              | NFC-11                                    |
+| Company story, home city, team, founding year              | `company.story`, `homeRegion`, `team`, `foundedYear`               | NFC-18, NFC-4                             |
+| MSME (Udyam) and DPIIT Startup India registrations         | `company.registrations`                                            | NFC-23                                    |
+| Contact lines for shippers, transporters and press         | `company.contactLines`                                             | NFC-6                                     |
+| Grievance Officer, response timelines, retention, courts   | `company.grievanceOfficer`, `grievanceTimelines`, etc.             | NFC-19                                    |
+| Refund timeline; payment and cancellation terms (legal)    | `company.refundDays`, `site_config` `shipper.charges`              | NFC-11                                    |
 
 ## Removed for having no source
 
@@ -68,6 +85,18 @@ These were taken out of the copy in all three languages. They come back only wit
 - "Works on any Android phone" (drivers). Softened to what the brief says: built for low-cost phones. The minimum Android version is NFC-16.
 - "32 ft containers": this came only from the sample catalogue. It's now "large containers" until the catalogue is in (NFC-1).
 - Earlier phases already removed "tolls at actuals", "2 hours free waiting" and "fuel included". All three wait on NFC-2.
+- "Our team stays with the trip until delivery" (`/how-it-works` FAQ). The blueprint lists a single point of contact as a claim to make only once confirmed (NFC-11, NFC-13).
+
+## Legal pages (DRAFT)
+
+- `/privacy`, `/terms`, `/refund-policy` and `/grievance` are drafts written for counsel to review. Each carries a "DRAFT – review by lawyer" banner until `company.legalReview.approved` is true (NFC-19).
+- They describe policies (for example "we don't sell personal data", the refund rule, the transporter obligations). These are proposals for the client and counsel, not confirmed facts.
+- Company and policy facts are `{tokens}` filled from `company.ts` and `site_config`. A missing one shows a marker in development and neutral wording ("the cancellation terms confirmed in your booking") in production.
+- The driver app's location collection ("while a trip is active") needs confirming by the app team (NFC-16).
+
+## Launch blocker
+
+- Production deploys (`VERCEL_ENV=production`) fail until `company.legalName`, `registeredAddress` and `cin` or `gstin` are set, because the footer must show them on every page (`src/launch-check.ts`). Other builds print a warning.
 
 ## Translations
 

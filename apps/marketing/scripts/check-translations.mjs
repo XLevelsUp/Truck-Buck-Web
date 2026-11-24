@@ -23,6 +23,7 @@ const SCOPES = [
   "drivers",
   "notFound",
   "footer",
+  "company",
   "features.steadyLoads",
   "features.noBidding",
   "features.transparentFee",
@@ -37,6 +38,9 @@ const SCOPES = [
 const LANGUAGE_NEUTRAL = new Set([
   "site.name",
   "cta.whatsapp",
+  "company.whatsapp",
+  "company.cin",
+  "company.gstin",
   "cta.playStoreLarge",
   "cta.appStoreSoon",
   "home.result.range",

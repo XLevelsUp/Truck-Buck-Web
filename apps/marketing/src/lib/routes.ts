@@ -52,9 +52,35 @@ export const routes = {
     path: "/privacy",
     changeFrequency: "yearly",
     priority: 0.3,
-    lastModified: "2026-10-31",
+    lastModified: "2026-11-24",
   },
-  terms: { path: "/terms", changeFrequency: "yearly", priority: 0.3, lastModified: "2026-10-31" },
+  terms: { path: "/terms", changeFrequency: "yearly", priority: 0.3, lastModified: "2026-11-24" },
+  refundPolicy: {
+    path: "/refund-policy",
+    changeFrequency: "yearly",
+    priority: 0.3,
+    lastModified: "2026-11-24",
+  },
+  grievance: {
+    path: "/grievance",
+    changeFrequency: "yearly",
+    priority: 0.3,
+    lastModified: "2026-11-24",
+  },
+  safety: {
+    path: "/safety",
+    changeFrequency: "monthly",
+    priority: 0.7,
+    lastModified: "2026-11-24",
+  },
+  about: { path: "/about", changeFrequency: "monthly", priority: 0.5, lastModified: "2026-11-24" },
+  contact: {
+    path: "/contact",
+    changeFrequency: "monthly",
+    priority: 0.6,
+    lastModified: "2026-11-24",
+  },
+  help: { path: "/help", changeFrequency: "weekly", priority: 0.6, lastModified: "2026-11-24" },
 } as const satisfies Record<string, RouteEntry>;
 
 export type RouteKey = keyof typeof routes;
@@ -62,13 +88,13 @@ export type RouteKey = keyof typeof routes;
 /** The fare widget's anchor on the home page. Becomes /book when the web app ships. */
 export const getPriceHref = "/#get-price";
 
-/** Header navigation. Help points at the home FAQ until /help ships (blueprint Phase 8). */
+/** Header navigation. */
 export const primaryNav = [
   { key: "shippers", href: routes.shippers.path },
   { key: "transporters", href: routes.transporters.path },
   { key: "drivers", href: routes.drivers.path },
   { key: "pricing", href: routes.pricing.path },
-  { key: "help", href: "/#faq" },
+  { key: "help", href: routes.help.path },
 ] as const;
 
 /** The fare widget's anchor on the home page in a given language. */

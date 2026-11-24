@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { helpFaqs } from "@/content/help";
 import { env } from "@/env";
 import { htmlLang, localizedHref, localizedPaths, prefixedLocales } from "@/i18n/locales";
 import { indexableLocales, isLocaleIndexable } from "@/i18n/publishing";
@@ -46,5 +47,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-  return [...pages, ...translated, ...truckPages];
+  const helpPages: MetadataRoute.Sitemap = helpFaqs().map((faq) => ({
+    url: absolute(`/help/${faq.slug}`),
+    changeFrequency: "monthly" as const,
+    priority: 0.4,
+  }));
+
+  return [...pages, ...translated, ...truckPages, ...helpPages];
 }

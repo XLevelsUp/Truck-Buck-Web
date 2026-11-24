@@ -162,3 +162,31 @@ export const DriverWaitlistInputSchema = z.object({
   transporter: z.string().trim().max(120).optional(),
 });
 export type DriverWaitlistInput = z.infer<typeof DriverWaitlistInputSchema>;
+
+/* -------------------------------------------------------------------------- */
+/* Support forms (Phase 6): /contact and /grievance.                          */
+/* -------------------------------------------------------------------------- */
+
+export const ContactTopicSchema = z.enum(["shipper", "transporter", "press", "other"]);
+
+export const ContactLeadInputSchema = z.object({
+  ...leadBase,
+  topic: ContactTopicSchema,
+  message: z.string().trim().min(10).max(2000),
+  email: z.email().max(200).optional().or(z.literal("")),
+  company: z.string().trim().max(120).optional(),
+});
+export type ContactLeadInput = z.infer<typeof ContactLeadInputSchema>;
+
+/** DPDP Act rights requests and complaints. "erasure" is stored as an account_deletion lead. */
+export const GrievanceKindSchema = z.enum(["complaint", "access", "correction", "erasure"]);
+
+export const GrievanceLeadInputSchema = z.object({
+  ...leadBase,
+  kind: GrievanceKindSchema,
+  message: z.string().trim().min(10).max(2000),
+  email: z.email().max(200).optional().or(z.literal("")),
+  /** Booking or lead reference, if the person has one. */
+  reference: z.string().trim().max(40).optional(),
+});
+export type GrievanceLeadInput = z.infer<typeof GrievanceLeadInputSchema>;

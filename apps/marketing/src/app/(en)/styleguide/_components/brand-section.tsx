@@ -119,7 +119,7 @@ export function BrandSection() {
         title="Truck illustrations"
         note="One oblique 3/4 projection for every class (truck-illustration.tsx), filled from the illo-* tokens. Used wherever a truck has no photo yet (NFC-8). Brief for a commissioned set: docs/illustration-brief.md."
       >
-        <ul className="sm:grid-cols-2 grid grid-cols-1 gap-4 lg:grid-cols-4">
+        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {truckIllustrationKinds.map((kind) => (
             <li
               key={kind}

@@ -51,6 +51,13 @@ export interface TestimonialRecord {
   company: string | null;
 }
 
+/** A real count from the booking system (site_metrics), already above its threshold. */
+export interface SiteMetric {
+  key: "trips_completed" | "transporters_onboarded";
+  value: number;
+  measuredAt: string;
+}
+
 export interface ClientLogoRecord {
   name: string;
   logoUrl: string;

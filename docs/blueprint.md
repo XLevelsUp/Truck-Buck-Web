@@ -523,7 +523,7 @@ Recommended default first; later phases proceed with it unless changed.
 
 **Business & legal**
 
-- [ ] **NFC-4 — Company identity:** registered legal name, CIN, GSTIN, registered office address (as on MCA), year founded.
+- [ ] **NFC-4 — Company identity:** registered legal name, CIN, GSTIN, registered office address (as on MCA), year founded. **Launch blocker:** production deploys fail until legal name, address and CIN or GSTIN are filled in (the footer shows them on every page).
 - [ ] **NFC-19 — Legal text:** counsel-approved Privacy Policy (covering the website _and_ the driver app, incl. location data), Terms of Use, and Grievance Officer name, designation, email, phone and response timeline.
 - [ ] **NFC-11 — Claims we're allowed to make**, each with yes/no and the exact wording: payment timeline to transporters, transporter fees/commission, shipper payment terms (advance / on delivery / credit), GST invoice for shippers, goods insurance, number of vetted transporters / trucks / cities (only if you want them published).
 
@@ -553,7 +553,11 @@ Recommended default first; later phases proceed with it unless changed.
 - [ ] **NFC-9 — Client logos** you have written permission to show.
 - [ ] **NFC-10 — Testimonials:** real quotes with name, role, company and written consent (photo optional).
 - [ ] **NFC-14 — Social media links** (if any) and brand assets (logo files, colours, fonts if fixed).
-- [ ] **NFC-18 — About us:** why TruckBuck was started (a few lines), founders' names/photos if you want them shown.
+- [ ] **NFC-18 — About us:** why TruckBuck was started (a few lines), founders' names/photos if you want them shown, the city you started in (only if true), and team members (name, role, photo with consent).
+
+**Registrations**
+
+- [ ] **NFC-23 — Registrations:** MSME Udyam number and DPIIT (Startup India) recognition number, only if TruckBuck holds them and wants them shown on /about.
 
 **Language**
 

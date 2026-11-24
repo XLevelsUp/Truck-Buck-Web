@@ -62,11 +62,11 @@ export function SiteFooter({
 
   return (
     <footer className="border-t bg-surface pb-20 md:pb-0">
-      <div className="mx-auto grid max-w-(--container-content) gap-10 page-gutter py-12 md:grid-cols-2 lg:grid-cols-4">
+      <div className="mx-auto grid max-w-(--container-content) gap-10 page-gutter py-12 md:grid-cols-3 lg:grid-cols-5">
         <FooterColumn title={content.company.forBusinessTitle}>
           <FooterLink href={getPriceHrefFor(locale)}>{content.cta.getPrice}</FooterLink>
           {primaryNav
-            .filter((item) => item.key === "shippers" || item.key === "help")
+            .filter((item) => item.key === "shippers" || item.key === "pricing")
             .map((item) => (
               <FooterLink key={item.key} href={item.href}>
                 {content.nav[item.key]}
@@ -88,6 +88,13 @@ export function SiteFooter({
           <li className="pt-2">
             <AppBadges locale={locale} />
           </li>
+        </FooterColumn>
+
+        <FooterColumn title={content.company.companyTitle}>
+          <FooterLink href={routes.about.path}>{content.nav.about}</FooterLink>
+          <FooterLink href={routes.safety.path}>{content.nav.safety}</FooterLink>
+          <FooterLink href={routes.help.path}>{content.nav.help}</FooterLink>
+          <FooterLink href={routes.contact.path}>{content.nav.contact}</FooterLink>
         </FooterColumn>
 
         <FooterColumn title={content.company.contactTitle}>
@@ -150,9 +157,8 @@ export function SiteFooter({
         <FooterColumn title={content.company.legalTitle}>
           <FooterLink href={routes.privacy.path}>{content.nav.privacy}</FooterLink>
           <FooterLink href={routes.terms.path}>{content.nav.terms}</FooterLink>
-          <li>
-            <MissingFact what="grievance officer details (NFC-19)" />
-          </li>
+          <FooterLink href={routes.refundPolicy.path}>{content.nav.refund}</FooterLink>
+          <FooterLink href={routes.grievance.path}>{content.nav.grievance}</FooterLink>
         </FooterColumn>
       </div>
 

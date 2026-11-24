@@ -5,7 +5,11 @@ import { join } from "node:path";
 
 import type { NextConfig } from "next";
 
+import { assertLaunchReady } from "./src/launch-check.ts";
 import { securityHeaders } from "./src/lib/security-headers.ts";
+
+// Production deploys need the company identity the footer shows (NFC-4).
+assertLaunchReady();
 
 const nextConfig: NextConfig = {
   // Self-contained server bundle, built only for the Docker image (the

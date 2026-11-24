@@ -17,6 +17,7 @@
     "@truckbuck/types": "workspace:*",
     "@truckbuck/ui": "workspace:*",
     "@truckbuck/utils": "workspace:*",
+    "fuse.js": "7.1.0",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "qrcode": "^1.5.4",

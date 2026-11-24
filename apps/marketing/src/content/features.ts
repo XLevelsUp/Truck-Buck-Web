@@ -35,6 +35,20 @@ export const featureStatus = {
   // Booking lifecycle (/how-it-works)
   shipperRating: "unconfirmed",
   paymentStatus: "unconfirmed",
+  // Transporter vetting (/safety). Vehicle papers and licences are the
+  // documents named in the Phase 4 brief; digital KYC is not integrated yet.
+  vetKyc: "roadmap",
+  vetVehicleDocs: "live",
+  vetDriverLicence: "live",
+  vetFirstTrip: "unconfirmed",
+  vetRatingThreshold: "unconfirmed",
+  // Cargo and driver safety (/safety)
+  incidentProcess: "unconfirmed",
+  insuranceGuidance: "unconfirmed",
+  noSpeedIncentives: "unconfirmed",
+  restStopPolicy: "unconfirmed",
+  // Brief: "later, safety-weighted non-cash driver rewards".
+  safetyWeightedRewards: "roadmap",
 } as const satisfies Record<string, FeatureStatus>;
 
 export type FeatureKey = keyof typeof featureStatus;

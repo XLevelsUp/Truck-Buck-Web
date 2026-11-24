@@ -4,7 +4,9 @@ import { after } from "next/server";
 
 import {
   BusinessLeadInputSchema,
+  ContactLeadInputSchema,
   DriverWaitlistInputSchema,
+  GrievanceLeadInputSchema,
   type LeadResult,
   TransporterLeadInputSchema,
 } from "@truckbuck/types";
@@ -168,6 +170,79 @@ export async function submitDriverWaitlist(input: unknown): Promise<LeadResult> 
     phone_e164: guard.phoneE164,
     city: lead.city,
     details: { transporter: lead.transporter ?? null, programme: "safe_driving_rewards" },
+    ...common(lead),
+  });
+  return saved
+    ? { ok: true, reference: referenceFor(saved.id), served: true }
+    : { ok: false, reason: "unavailable" };
+}
+
+/** /contact — general enquiry, routed by topic (shipper / transporter / press / other). */
+export async function submitContactLead(input: unknown): Promise<LeadResult> {
+  const content = getContent();
+  const parsed = ContactLeadInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      reason: "invalid",
+      fieldErrors: fieldErrorsFrom(parsed.error.flatten().fieldErrors, {
+        name: content.forms.nameError,
+        phone: content.forms.phoneError,
+        topic: content.forms.required,
+        message: content.support.messageError,
+        email: content.support.emailError,
+      }),
+    };
+  }
+  const lead = parsed.data;
+  const guard = await guardLead({ ...lead, phoneError: content.forms.phoneError });
+  if (!guard.ok) return guard.result;
+
+  const saved = await insertLead({
+    type: "contact",
+    name: lead.name,
+    phone_e164: guard.phoneE164,
+    email: lead.email || null,
+    company: lead.company || null,
+    details: { topic: lead.topic, message: lead.message },
+    ...common(lead),
+  });
+  return saved
+    ? { ok: true, reference: referenceFor(saved.id), served: true }
+    : { ok: false, reason: "unavailable" };
+}
+
+/**
+ * /grievance — complaints and DPDP Act rights requests (access, correction,
+ * erasure). Erasure requests are stored as type "account_deletion" so ops
+ * can action them separately; everything else as "grievance".
+ */
+export async function submitGrievance(input: unknown): Promise<LeadResult> {
+  const content = getContent();
+  const parsed = GrievanceLeadInputSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      reason: "invalid",
+      fieldErrors: fieldErrorsFrom(parsed.error.flatten().fieldErrors, {
+        name: content.forms.nameError,
+        phone: content.forms.phoneError,
+        kind: content.forms.required,
+        message: content.support.messageError,
+        email: content.support.emailError,
+      }),
+    };
+  }
+  const lead = parsed.data;
+  const guard = await guardLead({ ...lead, phoneError: content.forms.phoneError });
+  if (!guard.ok) return guard.result;
+
+  const saved = await insertLead({
+    type: lead.kind === "erasure" ? "account_deletion" : "grievance",
+    name: lead.name,
+    phone_e164: guard.phoneE164,
+    email: lead.email || null,
+    details: { kind: lead.kind, message: lead.message, reference: lead.reference ?? null },
     ...common(lead),
   });
   return saved

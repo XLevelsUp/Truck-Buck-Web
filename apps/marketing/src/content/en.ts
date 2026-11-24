@@ -21,7 +21,11 @@ export const en = {
     help: "Help",
     privacy: "Privacy",
     terms: "Terms",
-    grievance: "Grievance officer",
+    grievance: "Grievance redressal",
+    refund: "Refunds and cancellation",
+    safety: "Safety",
+    about: "About us",
+    contact: "Contact",
     skipToContent: "Skip to content",
     primary: "Main",
     openMenu: "Open menu",
@@ -263,6 +267,7 @@ export const en = {
     legalTitle: "Legal",
     forBusinessTitle: "For businesses",
     partnersTitle: "Partners",
+    companyTitle: "Company",
     phone: "Phone",
     email: "Email",
     whatsapp: "WhatsApp",
@@ -331,6 +336,268 @@ export const en = {
         cta: "Start your application",
       },
     },
+  },
+  support: {
+    topic: "What is this about?",
+    topics: [
+      { value: "shipper", label: "I need a truck" },
+      { value: "transporter", label: "I own trucks" },
+      { value: "press", label: "Press or partnership" },
+      { value: "other", label: "Something else" },
+    ],
+    company: "Company",
+    message: "Your message",
+    messageHint: "A few lines is enough. At least 10 characters.",
+    messageError: "Tell us a little more (at least 10 characters).",
+    emailError: "Enter a valid email, or leave it blank.",
+    submit: "Send message",
+    successTitle: "Message received",
+    successBody: "Reference {reference}. We'll call you on {phone}.",
+    kind: "What do you need?",
+    kinds: [
+      { value: "complaint", label: "Make a complaint" },
+      { value: "access", label: "See the data you hold about me" },
+      { value: "correction", label: "Correct my data" },
+      { value: "erasure", label: "Delete my data" },
+    ],
+    reference: "Booking or reference number",
+    referenceHint: "If you have one, e.g. TB-1A2B3C.",
+    submitGrievance: "Submit request",
+    grievanceSuccessTitle: "Request received",
+    grievanceSuccessBody:
+      "Reference {reference}. Keep it for your records. We may call {phone} to confirm it's you before we act on a data request.",
+  },
+  safety: {
+    meta: {
+      title: "How we vet every transporter",
+      description:
+        "What TruckBuck checks before a transporter can take your load, how cargo and drivers are kept safe, and what is still being built.",
+    },
+    hero: {
+      eyebrow: "Trust and safety",
+      title: "How we vet every transporter",
+      lead: "Only vetted transporters can accept a load on TruckBuck. Here is what we check, step by step, and what we are still building.",
+    },
+    pipeline: {
+      title: "The vetting pipeline",
+      lead: "A transporter moves to the next step only when the one before it passes.",
+      stepLabel: "Step {n}",
+      steps: [
+        {
+          key: "vetKyc",
+          title: "Identity (KYC)",
+          body: "Owner identity verified digitally with PAN and Aadhaar through DigiLocker or Setu.",
+          note: "Digital KYC is planned. Today we check the owner's PAN with their other documents.",
+        },
+        {
+          key: "vetVehicleDocs",
+          title: "Vehicle papers",
+          body: "RC, insurance and permit checked for every truck the transporter adds.",
+          note: "",
+        },
+        {
+          key: "vetDriverLicence",
+          title: "Driver licence",
+          body: "Each driver's licence checked before they can be assigned a trip.",
+          note: "",
+        },
+        {
+          key: "vetFirstTrip",
+          title: "First-trip review",
+          body: "Our team follows the transporter's first trip from pickup to delivery and reviews it.",
+          note: "",
+        },
+        {
+          key: "vetRatingThreshold",
+          title: "Ongoing rating",
+          body: "Shippers rate every trip. A transporter whose average falls below {rating} out of 5 is suspended automatically until we review it.",
+          note: "",
+        },
+      ],
+    },
+    cargo: {
+      title: "Keeping your cargo safe",
+      lead: "What happens to your goods between pickup and drop.",
+      items: {
+        podPhotoSignature: {
+          title: "Proof of delivery",
+          body: "A photo and the receiver's e-signature at drop, shared with you.",
+        },
+        liveTracking: { title: "Live tracking", body: "Follow the truck from pickup to drop." },
+        incidentProcess: {
+          title: "If something goes wrong",
+          body: "Report damage, delay or loss to us. We log it, inform both sides and follow it until it's closed.",
+        },
+        insuranceGuidance: {
+          title: "Insurance guidance",
+          body: "We tell you in writing what is and isn't covered for your booking.",
+        },
+      },
+    },
+    insurance: {
+      title: "Insurance: what is and isn't covered",
+      paragraphs: [
+        "A truck's own motor insurance covers the vehicle and third parties. It does not cover the goods it carries.",
+        "If your goods need cover, arrange goods-in-transit insurance before the trip and tell us. We'll confirm in writing what is covered for your booking, and by whom.",
+      ],
+    },
+    driver: {
+      title: "Keeping drivers safe",
+      lead: "Rested drivers on sensible schedules deliver loads safely.",
+      items: {
+        noSpeedIncentives: {
+          title: "No rewards for speed",
+          body: "We never pay drivers or transporters extra for arriving faster than the planned transit time.",
+        },
+        restStopPolicy: {
+          title: "Planned rest stops",
+          body: "Transit times include rest breaks, so nobody has to drive through the night to make a deadline.",
+        },
+        safetyWeightedRewards: {
+          title: "Rewards for safe driving",
+          body: "Driver rewards will be weighted on safety, not on how many trips a driver squeezes in.",
+        },
+      },
+    },
+    cta: {
+      title: "Questions about safety?",
+      body: "Talk to our team before you book.",
+      contact: "Contact us",
+    },
+  },
+  about: {
+    meta: {
+      title: "About TruckBuck",
+      description: "Why TruckBuck exists, the company behind it and how to reach us.",
+    },
+    hero: {
+      eyebrow: "About us",
+      title: "Booking a truck should be as simple as booking a cab.",
+      lead: "TruckBuck connects businesses that move full truckloads with vetted transporters, at a fare they can see up front, and builds its app around the drivers who do the work.",
+    },
+    missionTitle: "Our mission",
+    mission: "Make full-truck booking simple and fair for shippers, transporters and drivers.",
+    storyTitle: "Why we started",
+    homeRegion: "Based in {region}.",
+    teamTitle: "The team",
+    countersTitle: "TruckBuck so far",
+    counters: {
+      trips_completed: "trips completed",
+      transporters_onboarded: "transporters onboarded",
+      asOf: "Counted on {date}",
+    },
+    companyTitle: "Company details",
+    facts: {
+      legalName: "Registered name",
+      address: "Registered office",
+      cin: "CIN",
+      gstin: "GSTIN",
+      founded: "Founded",
+      msme: "MSME (Udyam)",
+      startup: "DPIIT recognition (Startup India)",
+    },
+    cta: { title: "Want to work with us?", body: "Tell us what you move or what you drive." },
+  },
+  contact: {
+    meta: {
+      title: "Contact TruckBuck",
+      description:
+        "Call, WhatsApp or write to TruckBuck. Separate lines for shippers, transporters and press.",
+    },
+    hero: {
+      eyebrow: "Contact",
+      title: "Talk to us",
+      lead: "Send a message and we'll call you back. Need a fare? The instant estimate is quicker.",
+    },
+    linesTitle: "Reach the right team",
+    lines: {
+      shippers: { title: "Shippers", body: "Bookings, fares and business accounts." },
+      transporters: { title: "Transporters", body: "Joining the network and your loads." },
+      press: { title: "Press and partnerships", body: "Media, partnerships and investors." },
+    },
+    phone: "Phone",
+    email: "Email",
+    whatsappTitle: "WhatsApp",
+    whatsappBody: "The quickest way to reach us.",
+    hours: "Hours",
+    officeTitle: "Registered office",
+    mapLabel: "Map showing TruckBuck's registered office",
+    showMap: "Show map",
+    openInMaps: "Open in Google Maps",
+    formTitle: "Send us a message",
+    formLead: "We'll reply by phone. Add your email if you'd rather get an email.",
+  },
+  help: {
+    meta: {
+      title: "Help centre",
+      description:
+        "Answers about booking a truck, fares, joining as a transporter, the driver app and your data.",
+    },
+    hero: {
+      eyebrow: "Help",
+      title: "How can we help?",
+      lead: "Search the answers or browse by topic.",
+    },
+    searchLabel: "Search help",
+    searchPlaceholder: "e.g. how is the fare calculated",
+    resultsCount: "{count} answers",
+    resultsOne: "1 answer",
+    noResults: "No answers match “{query}”. Try fewer words, or ask us below.",
+    browseTitle: "Browse by topic",
+    categories: {
+      booking: "Booking",
+      pricing: "Pricing",
+      payments: "Payments",
+      cancellation: "Cancellation",
+      tracking: "Tracking",
+      transporters: "Transporters",
+      drivers: "Drivers",
+      account: "Account and your data",
+    },
+    allTopics: "All help topics",
+    moreIn: "More in {category}",
+    readAnswer: "Read the answer",
+    stillNeedHelp: {
+      title: "Still need help?",
+      body: "Message us on WhatsApp, or send us a message and we'll call you.",
+      whatsapp: "Chat on WhatsApp",
+      contact: "Contact us",
+    },
+    extraFaqs: [
+      {
+        slug: "is-gst-included",
+        category: "pricing",
+        question: "Is GST included in the estimate?",
+        answer: "Yes. The fare range includes GST at the rate shown under the estimate.",
+      },
+      {
+        slug: "does-the-website-take-payment",
+        category: "payments",
+        question: "Do I pay anything on the website?",
+        answer: "No. Fare estimates and callbacks are free, and the website doesn't take payments.",
+      },
+      {
+        slug: "what-documents-do-transporters-need",
+        category: "transporters",
+        question: "What documents do I need to join?",
+        answer:
+          "RC, insurance and permit for each truck, your PAN card, bank details for payouts, and a licence for each driver. A GST certificate is optional. We collect them on WhatsApp during verification.",
+      },
+      {
+        slug: "how-are-transporters-vetted",
+        category: "transporters",
+        question: "How do you vet transporters?",
+        answer:
+          "Every transporter is checked before they can accept a load. Our safety page shows each step.",
+      },
+      {
+        slug: "how-do-i-get-my-data-deleted",
+        category: "account",
+        question: "How do I see, correct or delete my data?",
+        answer:
+          "Use the request form on our grievance page. Choose what you need, and we'll confirm it's you before acting on it.",
+      },
+    ],
   },
   missingFact: {
     label: "Needs from client",
@@ -966,62 +1233,268 @@ export const en = {
         answer:
           "The load is offered to the next vetted transporter, so you don't have to start again.",
       },
-      {
-        question: "Who do I talk to during a trip?",
-        answer: "Our team. We stay with the trip until delivery.",
-      },
     ],
   },
   legal: {
     lastUpdatedLabel: "Last updated",
     draftNotice:
-      "Draft text. This page must be replaced with counsel-approved copy before launch (NFC-19).",
+      "DRAFT – review by lawyer. This text has not been approved by counsel and is not in force yet (NFC-19).",
+    contentsTitle: "On this page",
+    /** Shown in production where a fact is still missing; development shows a marker instead. */
+    fallbacks: {
+      legalName: "TruckBuck",
+      address: "its registered office",
+      grievanceContact: "our Grievance Officer through the form on our grievance page",
+      ackTimeline: "the time the law allows",
+      resolveTimeline: "the time the law allows",
+      leadRetention: "they are no longer needed",
+      paymentTerms: "the payment terms confirmed in your booking",
+      cancellationTerms: "the cancellation terms confirmed in your booking",
+      feePercent: "the per-trip fee shown before you accept a load",
+      payoutTimeline: "on the schedule in your transporter agreement",
+      jurisdiction: "the place of our registered office",
+      refundDays: "a reasonable time",
+    },
+    formats: {
+      days: "{n} days",
+      workingDays: "{n} working days",
+      months: "{n} months",
+      fee: "a per-trip fee of {percent}% of the trip fare",
+      payout: "within {n} days of proof of delivery",
+      officer: "our Grievance Officer, {name} ({designation}), at {email}",
+    },
   },
   privacy: {
     title: "Privacy Policy",
-    description: "How TruckBuck collects, uses and protects your personal data.",
-    lastUpdated: "2026-10-31",
+    description:
+      "What personal data TruckBuck collects, why, how long we keep it and your rights under the DPDP Act, 2023.",
+    lastUpdated: "2026-11-24",
+    intro:
+      "This notice explains what personal data {legalName} (“TruckBuck”, “we”) collects through truckbuck.in and the TruckBuck driver app, why we collect it, how long we keep it, and the rights you have under the Digital Personal Data Protection Act, 2023 (the DPDP Act).",
     sections: [
       {
         heading: "Who we are",
-        body: "TruckBuck operates a closed-network truck booking platform for shippers, transporters and drivers in India.",
+        paragraphs: [
+          "{legalName}, with its registered office at {address}, is the Data Fiduciary for the personal data described here.",
+        ],
+        items: [],
       },
       {
-        heading: "What we collect",
-        body: "Account details (name, phone number, business details), booking and trip records, and — for drivers using the app — location during active trips.",
+        heading: "What we collect and why",
+        paragraphs: ["We collect only what each task needs:"],
+        items: [
+          "Fare estimates: pickup and drop places, truck type, pickup date, and optionally weight and material, to calculate a fare range. You don't need to give your name for this.",
+          "Callback, contact and business-account forms: your name and mobile number, and optionally email, company, GSTIN and city, to contact you about your request.",
+          "Transporter applications: owner name, mobile number, city, fleet size, truck types, home base and preferred routes. During verification, the documents you send us (RC, insurance, permit, PAN, GST certificate, bank details and driver licences), to verify you and pay you.",
+          "Driver app: name, mobile number, licence details, trip records and the phone's location while a trip is active, to show the trip to the shipper and transporter and to resolve disputes.",
+          "Technical data: a one-way hash of your IP address (for rate limiting), the page you came from and campaign tags, to protect the site from abuse and to see which channels bring enquiries.",
+          "Cookies: a language-preference cookie (tb_locale) and the security cookies our bot-protection provider, Cloudflare Turnstile, needs. We don't use advertising or analytics cookies.",
+        ],
       },
       {
-        heading: "How we use it",
-        body: "To operate bookings, verify transporters, settle payments, resolve disputes and meet legal obligations, including under the Digital Personal Data Protection Act, 2023.",
+        heading: "Why we're allowed to use it",
+        paragraphs: [
+          "We process your personal data with the consent you give when you submit a form or use the app, or for the legitimate uses the DPDP Act allows, such as meeting a legal obligation.",
+          "You can withdraw consent at any time through our grievance page. Withdrawing doesn't affect processing already done, but we may no longer be able to provide the service.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Who we share it with",
+        paragraphs: ["We don't sell personal data. We share it only with:"],
+        items: [
+          "the transporter and driver assigned to your booking, and only what they need for the trip;",
+          "service providers who process data for us under contract: website hosting (Vercel), database (Supabase), maps (Google Maps Platform), bot protection (Cloudflare) and WhatsApp messaging (Meta);",
+          "authorities, when the law requires it.",
+        ],
+      },
+      {
+        heading: "Where your data is stored",
+        paragraphs: [
+          "Some of our service providers may store or process data outside India. We transfer personal data only to countries the Government of India has not restricted under section 16 of the DPDP Act.",
+        ],
+        items: [],
+      },
+      {
+        heading: "How long we keep it",
+        paragraphs: [
+          "We keep personal data only for as long as we need it for the purpose we collected it for, or for longer if the law requires (for example, tax and accounting records).",
+          "Enquiries that don't lead to a booking are deleted after {leadRetention}. Short-lived security records, such as rate-limit counters and cached route lookups, are deleted automatically.",
+        ],
+        items: [],
       },
       {
         heading: "Your rights",
-        body: "You may request access, correction or erasure of your personal data by contacting us. We respond within the timelines required by law.",
+        paragraphs: ["Under the DPDP Act you can:"],
+        items: [
+          "get a summary of the personal data we hold about you and how we use it;",
+          "have inaccurate or incomplete data corrected, completed or updated;",
+          "have your data erased when it's no longer needed, unless the law requires us to keep it;",
+          "withdraw consent;",
+          "nominate someone to exercise these rights if you die or become unable to;",
+          "have a grievance heard and resolved.",
+        ],
+      },
+      {
+        heading: "How to use your rights",
+        paragraphs: [
+          "Send a request through the form on our grievance page. We may need to confirm it's you before we act on a request about your data.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Children",
+        paragraphs: [
+          "Our services are for businesses and working adults. We don't knowingly collect personal data from anyone under 18. If you think we have, tell us and we'll delete it.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Security and breaches",
+        paragraphs: [
+          "We protect personal data with encryption in transit, access controls and database row-level security. If a personal data breach happens, we will inform the Data Protection Board of India and the people affected, as the law requires.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Grievance Officer",
+        paragraphs: [
+          "Contact {grievanceContact}. We acknowledge a grievance within {ackTimeline} and resolve it within {resolveTimeline}.",
+          "If you're not satisfied with our response, you can complain to the Data Protection Board of India.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Changes to this policy",
+        paragraphs: [
+          "We'll publish any change here with a new date. If a change affects how we use data you have already given us, we'll tell you before it applies.",
+        ],
+        items: [],
       },
     ],
   },
   terms: {
     title: "Terms of Service",
-    description: "The terms that govern use of the TruckBuck platform.",
-    lastUpdated: "2026-10-31",
+    description:
+      "The terms for using truckbuck.in and booking or carrying loads through TruckBuck.",
+    lastUpdated: "2026-11-24",
+    intro:
+      "These terms apply when you use truckbuck.in or TruckBuck's services. By using them, you agree to these terms. Some sections apply only to shippers and some only to transporters.",
     sections: [
       {
-        heading: "Eligibility",
-        body: "TruckBuck is a closed network. Access is granted to shippers and transporters approved by TruckBuck.",
+        heading: "Who we are",
+        paragraphs: [
+          "TruckBuck is operated by {legalName}, registered office {address}. TruckBuck runs a closed network that connects shippers who need full truckloads with transporters it has vetted.",
+        ],
+        items: [],
       },
       {
-        heading: "Bookings and fees",
-        body: "Fares and per-trip platform fees are shown before a booking is confirmed. Fees are non-refundable once a trip starts, except as set out in our dispute process.",
+        heading: "Using the website",
+        paragraphs: [],
+        items: [
+          "Fare estimates are ranges based on the details you enter. They are not offers. The final fare is confirmed with you before anything is booked.",
+          "Give accurate details in every form.",
+          "Don't misuse the site: no automated scraping, no false information and no attempts to get around its security.",
+        ],
       },
       {
-        heading: "Disputes",
-        body: "Raise disputes through the platform within 7 days of trip completion. TruckBuck will review evidence from both parties.",
+        heading: "If you are a shipper",
+        paragraphs: [],
+        items: [
+          "Describe your goods, their weight and the pickup and drop addresses accurately.",
+          "Don't book illegal goods. Don't book hazardous goods unless we have agreed to it in writing.",
+          "Have the goods ready to load at the agreed time, and arrange loading and unloading unless your booking says otherwise.",
+          "Provide the documents the law requires for your goods, such as invoices and e-way bills.",
+          "Pay according to {paymentTerms}.",
+          "Cancellations are governed by {cancellationTerms}.",
+          "Report loss, damage or delay to us in writing as soon as you notice it, with the delivery notes.",
+        ],
       },
       {
-        heading: "Governing law",
-        body: "These terms are governed by the laws of India.",
+        heading: "If you are a transporter",
+        paragraphs: [],
+        items: [
+          "Pass our vetting before accepting loads, and keep every vehicle's RC, insurance and permit, and every driver's licence, valid.",
+          "Assign only licensed drivers who are fit to drive, and never overload a vehicle beyond its permitted weight.",
+          "Follow the Motor Vehicles Act and all other laws that apply to the trip.",
+          "TruckBuck charges {feePercent}. Payouts are made {payoutTimeline}.",
+          "We may suspend a transporter whose ratings fall below our threshold, or who breaks these terms, while we review it.",
+        ],
+      },
+      {
+        heading: "Liability",
+        paragraphs: [
+          "We are responsible for providing our services with reasonable care and skill. We are not liable for losses we could not reasonably foresee. Our liability for any booking is limited to the extent the law allows.",
+          "Nothing in these terms limits any liability that cannot be limited by law.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Governing law and disputes",
+        paragraphs: [
+          "These terms are governed by the laws of India. Disputes go to the courts at {jurisdiction}.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Changes to these terms",
+        paragraphs: [
+          "We'll publish any change here with a new date. Changes don't affect bookings already confirmed.",
+        ],
+        items: [],
       },
     ],
+  },
+  refundPolicy: {
+    title: "Refund and Cancellation Policy",
+    description: "How cancellations and refunds work for bookings made through TruckBuck.",
+    lastUpdated: "2026-11-24",
+    intro:
+      "This policy explains how cancellations and refunds work for loads booked through TruckBuck.",
+    sections: [
+      {
+        heading: "The website is free",
+        paragraphs: [
+          "Fare estimates and callback requests on truckbuck.in are free. The website doesn't take payments.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Cancelling a booking",
+        paragraphs: ["Cancellations are governed by {cancellationTerms}."],
+        items: [],
+      },
+      {
+        heading: "Refunds",
+        paragraphs: [
+          "If you have paid for a booking that we or the transporter cancel, or that can't be completed, we refund the amount you paid for the part that wasn't delivered. Refunds go to the original payment method within {refundDays}.",
+        ],
+        items: [],
+      },
+      {
+        heading: "Disputes about a trip",
+        paragraphs: [
+          "If you disagree with a charge, raise it through our grievance page with your booking reference. We'll review the trip records and reply.",
+        ],
+        items: [],
+      },
+    ],
+  },
+  grievance: {
+    title: "Grievance Redressal",
+    description:
+      "How to raise a complaint or a data request with TruckBuck's Grievance Officer, and how long we take to respond.",
+    lastUpdated: "2026-11-24",
+    intro:
+      "Use this page to make a complaint about our service or a request about your personal data under the DPDP Act, 2023.",
+    officerTitle: "Grievance Officer",
+    officerFields: { name: "Name", designation: "Designation", email: "Email", phone: "Phone" },
+    timelinesTitle: "How long it takes",
+    timelines:
+      "We acknowledge your grievance within {ackTimeline} and resolve it within {resolveTimeline}.",
+    escalation:
+      "If you're not satisfied with our response to a data request, you can complain to the Data Protection Board of India.",
+    formTitle: "Raise a grievance or data request",
   },
   notFound: {
     title: "Page not found",

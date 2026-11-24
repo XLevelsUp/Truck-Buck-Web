@@ -7,6 +7,7 @@ import { Hero } from "@/components/home/hero";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { Audiences, Comparison, FinalCta, TrustStrip } from "@/components/home/sections";
 import { TruckCarousel } from "@/components/home/truck-carousel";
+import { LiveCountersSection } from "@/components/live-counters";
 import { getContent } from "@/content";
 import { htmlLang, type Locale, localizedHref } from "@/i18n/locales";
 import { indexableLocales } from "@/i18n/publishing";
@@ -69,6 +70,8 @@ export async function HomePage({ locale }: { locale: Locale }) {
         isSample={catalog.usesSampleData}
         locale={locale}
       />
+      {/* Counter labels are English-only, so the band shows on English pages only. */}
+      {locale === "en" ? <LiveCountersSection /> : null}
       <SocialProof testimonials={social.testimonials} logos={social.logos} locale={locale} />
       <HomeFaq faqs={faqs} locale={locale} />
       <FinalCta locale={locale} />

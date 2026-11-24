@@ -12,6 +12,7 @@ import type {
   Faq,
   Lane,
   ServiceArea,
+  SiteMetric,
   TestimonialRecord,
   TruckIconKey,
   TruckType,
@@ -226,7 +227,10 @@ export async function getFaqs(page: string): Promise<Faq[]> {
   return data ?? [];
 }
 
-/** Only published rows with consent on file — enforced by a DB check constraint too. */
+/**
+ * Only published rows with consent/permission on file AND a named approver.
+ * The database enforces the same rules with check constraints.
+ */
 export async function getSocialProof(): Promise<{
   testimonials: TestimonialRecord[];
   logos: ClientLogoRecord[];
@@ -243,12 +247,14 @@ export async function getSocialProof(): Promise<{
       .select("quote,name,role,company")
       .eq("published", true)
       .eq("consent_on_file", true)
+      .not("approved_at", "is", null)
       .order("sort_order"),
     db
       .from("client_logos")
       .select("name,logo_url")
       .eq("published", true)
       .eq("permission_on_file", true)
+      .not("approved_at", "is", null)
       .order("sort_order"),
   ]);
   return {
@@ -278,9 +284,16 @@ export interface ShipperChargesConfig {
   payment_terms: string | null;
 }
 
+export interface MetricThresholdsConfig {
+  trips_completed: number | null;
+  transporters_onboarded: number | null;
+  max_age_days: number;
+}
+
 interface SiteConfigShape {
   "transporter.fee": TransporterFeeConfig;
   "shipper.charges": ShipperChargesConfig;
+  "metrics.thresholds": MetricThresholdsConfig;
 }
 
 /** Defaults mirror the seed: unknown values are null and render as missing-fact markers. */
@@ -297,6 +310,7 @@ const siteConfigDefaults: SiteConfigShape = {
     cancellation: null,
     payment_terms: null,
   },
+  "metrics.thresholds": { trips_completed: null, transporters_onboarded: null, max_age_days: 7 },
 };
 
 export async function getSiteConfig<K extends keyof SiteConfigShape>(
@@ -315,4 +329,31 @@ export async function getSiteConfig<K extends keyof SiteConfigShape>(
     .maybeSingle<{ value: Partial<SiteConfigShape[K]>; is_sample: boolean }>();
   if (!data || (data.is_sample && !serverEnv.allowSampleData)) return siteConfigDefaults[key];
   return { ...siteConfigDefaults[key], ...data.value };
+}
+
+/**
+ * Live counters. Only real counts written by the booking system's job
+ * (site_metrics), only while fresh, and only at or above the client's
+ * threshold. No database, no row, no threshold or a stale row = nothing shown.
+ * There is deliberately no sample fallback.
+ */
+export async function getSiteMetrics(): Promise<SiteMetric[]> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("site-metrics");
+
+  const db = getSupabase();
+  if (!db) return [];
+  const thresholds = await getSiteConfig("metrics.thresholds");
+  const { data, error } = await db.from("site_metrics").select("key,value,measured_at");
+  if (error || !data) return [];
+  const maxAgeMs = thresholds.max_age_days * 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  return (data as { key: SiteMetric["key"]; value: number; measured_at: string }[])
+    .filter((row) => {
+      const minimum = thresholds[row.key];
+      if (minimum === null || row.value < minimum) return false;
+      return now - new Date(row.measured_at).getTime() <= maxAgeMs;
+    })
+    .map((row) => ({ key: row.key, value: Number(row.value), measuredAt: row.measured_at }));
 }
