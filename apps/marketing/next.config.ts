@@ -19,6 +19,20 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   cacheComponents: true,
   partialPrefetching: true,
+  images: {
+    // Truck photos/renders: modern formats, fixed 4:3 frames (no layout shift).
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      { protocol: "https", hostname: "*.supabase.co", pathname: "/storage/v1/object/public/**" },
+    ],
+  },
+  experimental: {
+    // ~12 KB of Tailwind CSS: inlining removes the render-blocking stylesheet
+    // request for first-time mobile visitors (most of our traffic).
+    inlineCss: true,
+    // Two root layouts ((en), [locale]) → unmatched URLs use app/global-not-found.tsx.
+    globalNotFound: true,
+  },
   turbopack: {
     root: join(import.meta.dirname, "../.."),
     rules: {

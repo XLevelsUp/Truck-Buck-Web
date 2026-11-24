@@ -50,6 +50,18 @@
     },
     "//#lint:colors": {
       "inputs": ["scripts/check-raw-colors.mjs", "apps/*/src/**/*.css", "packages/*/src/**/*.css"]
+    },
+    "//#lint:content": {
+      "inputs": [
+        "scripts/check-content.mjs",
+        "docs/blueprint.md",
+        "apps/marketing/src/**",
+        "packages/*/src/**",
+        "supabase/**"
+      ]
+    },
+    "//#lint:i18n": {
+      "inputs": ["apps/marketing/scripts/check-translations.mjs", "apps/marketing/src/content/**"]
     }
   }
 }

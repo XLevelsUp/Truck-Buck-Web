@@ -6,4 +6,5 @@ export {
   startOfDayIST,
   toISTDateKey,
 } from "./date";
+export { gstinCheckChar, isValidGstin, normalizeGstin } from "./gstin";
 export { formatIndianMobile, isValidIndianMobile, normalizeIndianMobile } from "./phone";

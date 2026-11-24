@@ -45,7 +45,7 @@ export function TruckCard({
     >
       <div
         aria-hidden="true"
-        className="grid aspect-[4/3] place-items-center overflow-hidden rounded-lg bg-primary-soft text-primary-soft-foreground [&>svg]:size-20"
+        className="relative grid aspect-[4/3] place-items-center overflow-hidden rounded-lg bg-primary-soft text-primary-soft-foreground [&>svg]:size-20"
       >
         {media}
       </div>

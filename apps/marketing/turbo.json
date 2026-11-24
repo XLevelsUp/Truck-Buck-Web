@@ -10,17 +10,49 @@
         "VERCEL_ENV",
         "VERCEL_URL",
         "VERCEL_BRANCH_URL",
-        "VERCEL_PROJECT_PRODUCTION_URL"
+        "VERCEL_PROJECT_PRODUCTION_URL",
+        "SUPABASE_URL",
+        "SUPABASE_SECRET_KEY",
+        "GOOGLE_MAPS_API_KEY",
+        "TURNSTILE_SECRET_KEY",
+        "RATE_LIMIT_SALT",
+        "ALLOW_SAMPLE_DATA",
+        "WHATSAPP_CLOUD_TOKEN",
+        "WHATSAPP_PHONE_NUMBER_ID",
+        "WHATSAPP_TRANSPORTER_TEMPLATE",
+        "PREVIEW_UNREVIEWED_LOCALES"
       ]
     },
     "typecheck": {
       "env": ["NEXT_PUBLIC_*"]
     },
     "dev": {
-      "passThroughEnv": ["NEXT_PUBLIC_*"]
+      "passThroughEnv": [
+        "NEXT_PUBLIC_*",
+        "SUPABASE_URL",
+        "SUPABASE_SECRET_KEY",
+        "GOOGLE_MAPS_API_KEY",
+        "TURNSTILE_SECRET_KEY",
+        "RATE_LIMIT_SALT",
+        "ALLOW_SAMPLE_DATA",
+        "WHATSAPP_CLOUD_TOKEN",
+        "WHATSAPP_PHONE_NUMBER_ID",
+        "WHATSAPP_TRANSPORTER_TEMPLATE",
+        "PREVIEW_UNREVIEWED_LOCALES"
+      ]
     },
     "test:e2e": {
-      "env": ["NEXT_PUBLIC_*"],
+      "env": [
+        "NEXT_PUBLIC_*",
+        "SUPABASE_URL",
+        "SUPABASE_SECRET_KEY",
+        "GOOGLE_MAPS_API_KEY",
+        "TURNSTILE_SECRET_KEY",
+        "RATE_LIMIT_SALT",
+        "ALLOW_SAMPLE_DATA",
+        "SUPABASE_PUBLISHABLE_KEY",
+        "PREVIEW_UNREVIEWED_LOCALES"
+      ],
       "passThroughEnv": ["E2E_PORT"]
     }
   }

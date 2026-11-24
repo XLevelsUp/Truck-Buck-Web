@@ -1,6 +1,6 @@
 "use client";
 
-import { type ChangeEvent, type ComponentProps, useState } from "react";
+import type { ChangeEvent, ComponentProps } from "react";
 
 import { normalizeIndianMobile } from "@truckbuck/utils";
 
@@ -48,12 +48,13 @@ export function PhoneInput({
   prefix = "+91",
   ...props
 }: PhoneInputProps) {
-  const [internal, setInternal] = useState(() => formatNational(toNationalDigits(defaultValue)));
-  const value = valueProp === undefined ? internal : formatNational(toNationalDigits(valueProp));
+  const controlled = valueProp !== undefined;
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const national = toNationalDigits(event.target.value);
-    setInternal(formatNational(national));
+    // Uncontrolled: format in place. The DOM keeps whatever was typed before
+    // hydration, so a slow phone never loses input.
+    if (!controlled) event.target.value = formatNational(national);
     onValueChange?.({ national, e164: normalizeIndianMobile(national) });
   }
 
@@ -77,7 +78,9 @@ export function PhoneInput({
         inputMode="numeric"
         autoComplete="tel-national"
         placeholder="98765 43210"
-        value={value}
+        {...(controlled
+          ? { value: formatNational(toNationalDigits(valueProp)) }
+          : { defaultValue: formatNational(toNationalDigits(defaultValue)) })}
         onChange={handleChange}
         onBlur={onBlur}
         className="h-full min-w-0 flex-1 bg-transparent pr-3 text-base outline-none placeholder:text-muted-foreground"

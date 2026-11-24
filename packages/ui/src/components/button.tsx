@@ -6,7 +6,7 @@ import { cn } from "../lib/utils";
 import { Spinner } from "./spinner";
 
 export const buttonVariants = cva(
-  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg font-semibold whitespace-nowrap focus-ring transition-colors duration-fast ease-standard select-none disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "relative inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg text-center leading-tight font-semibold text-balance focus-ring transition-colors duration-fast ease-standard select-none disabled:cursor-not-allowed disabled:opacity-50 aria-busy:cursor-progress [&_svg]:pointer-events-none [&_svg]:shrink-0",
   {
     variants: {
       variant: {
@@ -22,14 +22,15 @@ export const buttonVariants = cva(
         danger: "bg-danger text-danger-foreground hover:opacity-90",
       },
       size: {
-        sm: "h-9 px-3 text-sm [&_svg]:size-4",
-        md: "h-11 px-5 text-base [&_svg]:size-5",
-        lg: "h-13 px-6 text-lg [&_svg]:size-5",
+        // Minimum heights, not fixed ones: translated labels (Tamil, Hindi) may wrap.
+        sm: "min-h-9 px-3 py-1.5 text-sm [&_svg]:size-4",
+        md: "min-h-11 px-5 py-2 text-base [&_svg]:size-5",
+        lg: "min-h-13 px-6 py-2.5 text-lg [&_svg]:size-5",
         icon: "size-11 [&_svg]:size-5",
       },
       block: { true: "w-full" },
     },
-    compoundVariants: [{ variant: "link", class: "h-auto px-0" }],
+    compoundVariants: [{ variant: "link", class: "min-h-0 px-0 py-0" }],
     defaultVariants: { variant: "primary", size: "md" },
   },
 );

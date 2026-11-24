@@ -17,6 +17,29 @@ export {
   PaiseSchema,
   TenantScopedSchema,
 } from "./common";
+export {
+  type BusinessLeadInput,
+  BusinessLeadInputSchema,
+  type DriverWaitlistInput,
+  DriverWaitlistInputSchema,
+  type EstimatePlace,
+  type EstimateRequest,
+  EstimateRequestSchema,
+  type EstimateResponse,
+  FleetSizeSchema,
+  IsoDateSchema,
+  LeadLocaleSchema,
+  type LeadResult,
+  MonthlyTripsSchema,
+  PlaceIdSchema,
+  type QuoteLeadInput,
+  QuoteLeadInputSchema,
+  type TransporterLeadInput,
+  TransporterLeadInputSchema,
+  TruckSlugSchema,
+  type Utm,
+  UtmSchema,
+} from "./marketing";
 export { type Tenant, TenantSchema, TenantStatusSchema } from "./tenant";
 export { type Transporter, TransporterSchema, VettingStatusSchema } from "./transporter";
 export { type Trip, TripSchema, TripStatusSchema, VehicleNumberSchema } from "./trip";

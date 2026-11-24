@@ -3,7 +3,7 @@ import type { ComponentProps } from "react";
 import { cn } from "../lib/utils";
 
 /**
- * Placeholder with the exact size of the content it stands in for, so
+ * Stand-in with the exact size of the content it stands in for, so
  * nothing shifts when data arrives (CLS). Decorative: put `aria-busy` on the
  * region that is loading.
  */

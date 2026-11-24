@@ -18,7 +18,7 @@ export function LegalDocument({ title, lastUpdated, sections }: LegalDocumentPro
         role="note"
         className="mt-6 rounded-md border border-warning bg-warning/15 px-4 py-3 text-sm"
       >
-        {legal.placeholderNotice}
+        {legal.draftNotice}
       </p>
       {sections.map((section) => (
         <section key={section.heading} className="mt-8">

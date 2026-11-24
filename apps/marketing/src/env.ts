@@ -27,6 +27,15 @@ const schema = z.object({
     .refine((url) => url.startsWith("https://play.google.com/"), {
       message: "Must be a https://play.google.com/ listing URL",
     }),
+  /** WhatsApp Business number, digits only with country code (919876543210). Unset hides WhatsApp CTAs. */
+  NEXT_PUBLIC_WHATSAPP_NUMBER: z
+    .string()
+    .regex(/^91[6-9]\d{9}$/, { error: message("Must be 91 followed by a 10-digit mobile number") })
+    .optional(),
+  /** Cloudflare Turnstile site key. Dev falls back to Cloudflare's always-pass test key. */
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1).optional(),
+  /** Referrer-restricted Maps Embed API key for the tap-to-open interactive map. Unset = link out to Google Maps. */
+  NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY: z.string().min(1).optional(),
 });
 
 /**
@@ -47,6 +56,12 @@ function vercelSiteUrl(): string | undefined {
 const parsed = schema.safeParse({
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || vercelSiteUrl(),
   NEXT_PUBLIC_PLAY_STORE_URL: process.env.NEXT_PUBLIC_PLAY_STORE_URL,
+  NEXT_PUBLIC_WHATSAPP_NUMBER: process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || undefined,
+  NEXT_PUBLIC_TURNSTILE_SITE_KEY:
+    process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ||
+    // Cloudflare's documented always-pass test key, outside production only.
+    (process.env.VERCEL_ENV === "production" ? undefined : "1x00000000000000000000AA"),
+  NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY || undefined,
 });
 
 if (!parsed.success) {

@@ -7,3 +7,74 @@
   --tb-font-devanagari: var(--font-noto-devanagari);
   --tb-font-tamil: var(--font-noto-tamil);
 }
+
+/* Booking-flow loop (PhoneMockup, How it works): four steps on one 10s clock,
+   2.5s each (src/components/visuals/loop.ts). Opacity/transform only.
+   Under prefers-reduced-motion no animation is applied at all. */
+@keyframes tb-phone-screen {
+  0% {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  3%,
+  22% {
+    opacity: 1;
+    transform: none;
+  }
+  25%,
+  100% {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}
+
+@keyframes tb-step-active {
+  0%,
+  22% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Tracking screen: the truck drives from pickup to drop within its step. */
+@keyframes tb-phone-truck {
+  0%,
+  3% {
+    transform: translateX(0);
+  }
+  20%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* <LoopFrame>'s pause button freezes every loop inside it (WCAG 2.2.2). */
+[data-loop-paused] * {
+  animation-play-state: paused !important;
+}
+
+/* Tamil and Hindi words can be much longer than English ones at display
+   sizes. Allow a break inside a word only when nothing else fits, so a long
+   word never pushes the page sideways on a 360px phone. */
+:where(:lang(ta), :lang(hi)) :where(h1, h2, h3, h4, p, li, a, button, label, legend, dt, dd) {
+  overflow-wrap: anywhere;
+}
+
+/* Tamil and Devanagari glyphs have tall ascenders and deep descenders (vowel
+   signs above and below the line). Latin-tuned leading clips them in large
+   headings and crowds body text, so both scripts get more room. */
+:lang(ta) :is(h1, h2, h3, h4) {
+  line-height: 1.35;
+}
+:lang(hi) :is(h1, h2, h3, h4) {
+  line-height: 1.3;
+}
+:lang(ta) :is(p, li, dd, dt, label, legend, summary) {
+  line-height: 1.75;
+}
+:lang(hi) :is(p, li, dd, dt, label, legend, summary) {
+  line-height: 1.7;
+}

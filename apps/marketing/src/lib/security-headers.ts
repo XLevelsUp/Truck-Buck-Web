@@ -11,11 +11,15 @@
 export function securityHeaders({ isDev }: { isDev: boolean }) {
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+    // Cloudflare Turnstile (lead forms only, loaded on demand).
+    `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob:",
     "font-src 'self'",
+    // All Maps traffic goes through our own /api routes.
     `connect-src 'self'${isDev ? " ws:" : ""}`,
+    // Turnstile challenge + the tap-to-open Google Maps embed.
+    "frame-src https://challenges.cloudflare.com https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
@@ -30,7 +34,10 @@ export function securityHeaders({ isDev }: { isDev: boolean }) {
     { key: "X-Frame-Options", value: "DENY" },
     { key: "X-Content-Type-Options", value: "nosniff" },
     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-    { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), payment=()" },
+    {
+      key: "Permissions-Policy",
+      value: "camera=(), microphone=(), geolocation=(self), payment=()",
+    },
     { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
   ];
 }

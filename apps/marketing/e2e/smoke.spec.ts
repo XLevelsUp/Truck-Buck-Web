@@ -17,16 +17,14 @@ test("home page renders with SEO essentials and security headers", async ({ page
     /^https?:\/\/[^/]+\/?$/,
   );
 
-  const jsonLd = await page.locator('script[type="application/ld+json"]').textContent();
-  expect(JSON.parse(jsonLd ?? "{}")).toMatchObject({ "@type": "Organization", name: "TruckBuck" });
+  const jsonLd = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const types = jsonLd.map((text) => (JSON.parse(text) as { "@type": string })["@type"]);
+  expect(types).toEqual(expect.arrayContaining(["Organization", "FAQPage"]));
 });
 
 test("legal pages are reachable from the footer", async ({ page }) => {
   await page.goto("/");
-  await page
-    .getByRole("navigation", { name: "Legal" })
-    .getByRole("link", { name: "Privacy" })
-    .click();
+  await page.getByRole("contentinfo").getByRole("link", { name: "Privacy" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Privacy Policy" })).toBeVisible();
 });
 

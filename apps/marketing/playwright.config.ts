@@ -7,6 +7,8 @@ const isCI = Boolean(process.env.CI);
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
+  // axe runs are CPU-heavy; more local workers made timing-sensitive tests flaky.
+  workers: isCI ? 2 : 3,
   forbidOnly: isCI,
   retries: isCI ? 2 : 0,
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["list"]],

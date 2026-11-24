@@ -549,11 +549,15 @@ Recommended default first; later phases proceed with it unless changed.
 
 **Brand & proof**
 
-- [ ] **NFC-8 — Real photos:** trucks (each type), drivers/team (with consent), operations; plus 3–5 driver app screenshots. Minimum 2000 px wide.
+- [ ] **NFC-8 — Real photos:** trucks (each type), drivers/team (with consent), operations; plus 3–5 driver app screenshots. Minimum 2000 px wide. Shot list with framing, ratios and consent: [docs/photography-shot-list.md](photography-shot-list.md).
 - [ ] **NFC-9 — Client logos** you have written permission to show.
 - [ ] **NFC-10 — Testimonials:** real quotes with name, role, company and written consent (photo optional).
 - [ ] **NFC-14 — Social media links** (if any) and brand assets (logo files, colours, fonts if fixed).
 - [ ] **NFC-18 — About us:** why TruckBuck was started (a few lines), founders' names/photos if you want them shown.
+
+**Language**
+
+- [ ] **NFC-22 — Native-speaker review:** a fluent Hindi reader and a fluent Tamil reader (ideally someone who talks to drivers and transporters daily) to review the draft translations of `/`, `/drivers` and `/transporters`, and sign off by name. Until each language is signed off, its pages stay hidden in production (`noindex`, not in the language switcher or sitemap).
 
 **Access**
 

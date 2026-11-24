@@ -18,7 +18,7 @@ export function addDaysToKey(key: string, days: number): string {
 const noopSubscribe = () => () => {};
 
 /** Today's IST date, read on the client only (static pages are built days earlier). */
-function useTodayIST(): string | null {
+export function useTodayIST(): string | null {
   return useSyncExternalStore(
     noopSubscribe,
     () => toISTDateKey(Date.now()),
@@ -89,7 +89,7 @@ export function DatePicker({
                 aria-pressed={pressed}
                 onClick={() => key && change(key)}
                 className={cn(
-                  "touch-target rounded-full border px-4 text-sm font-semibold focus-ring transition-colors duration-fast disabled:opacity-50",
+                  "touch-target rounded-full border px-4 text-sm font-semibold focus-ring disabled:opacity-50",
                   pressed
                     ? "border-primary bg-primary text-primary-foreground"
                     : "border-border-strong bg-surface text-surface-foreground hover:bg-surface-muted",

@@ -94,6 +94,7 @@ export function Combobox({
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
   const listRef = useRef<HTMLUListElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const visible = useMemo(() => {
     // Show everything when the text is just the current selection.
@@ -114,6 +115,19 @@ export function Combobox({
     if (inputValueProp === undefined) setInternalText(next);
     onInputChange?.(next);
   }
+
+  // On a slow phone people start typing before the page hydrates. That text
+  // lives only in the DOM, so adopt it once on mount instead of losing it.
+  useEffect(() => {
+    const input = inputRef.current;
+    const typed = input?.value ?? "";
+    if (!input || typed === "" || typed === text) return;
+    queueMicrotask(() => {
+      setText(typed);
+      if (document.activeElement === input) setOpen(true);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount only
+  }, []);
 
   function select(option: ComboboxOption | null) {
     if (valueProp === undefined) setInternalValue(option?.value ?? null);
@@ -184,6 +198,7 @@ export function Combobox({
           </span>
         ) : null}
         <input
+          ref={inputRef}
           id={id}
           type="text"
           role="combobox"

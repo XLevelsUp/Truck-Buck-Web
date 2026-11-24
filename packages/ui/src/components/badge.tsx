@@ -8,7 +8,7 @@ import { cn } from "../lib/utils";
  * Never rely on colour alone: the text must carry the meaning.
  */
 export const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-xs leading-5 font-semibold whitespace-nowrap [&_svg]:size-3.5",
+  "inline-flex w-fit max-w-full shrink-0 items-center gap-1 rounded-2xl px-2.5 py-0.5 text-xs leading-5 font-semibold [&_svg]:size-3.5",
   {
     variants: {
       variant: {
