@@ -33,6 +33,7 @@ export const en = {
     menuTitle: "Menu",
     menuDescription: "Pages and ways to reach us",
     quickActions: "Quick actions",
+    breadcrumb: "Breadcrumb",
   },
   cta: {
     getPrice: "Get a price",
@@ -598,6 +599,110 @@ export const en = {
           "Use the request form on our grievance page. Choose what you need, and we'll confirm it's you before acting on it.",
       },
     ],
+  },
+  truckBooking: {
+    breadcrumb: "Truck booking",
+    hub: {
+      metaTitle: "Truck booking by city and route",
+      metaDescription:
+        "Every city and lane TruckBuck serves, with road distance and fares per truck type. Book a full truck with vetted transporters.",
+      eyebrow: "Where we operate",
+      title: "Truck booking by city and route",
+      lead: "Pick your city or lane to see distances, truck types and fares.",
+      citiesTitle: "Cities",
+      routesTitle: "Routes",
+    },
+    sampleNotice:
+      "Sample data for testing. This page is not indexed until real lanes, rates and distances are in.",
+    city: {
+      metaTitle: "Truck booking in {city} | Full truckload",
+      metaDescription:
+        "Book a full truck in {city}, {state}: see the fare up front, choose from {trucks} truck types and ship on {routes} routes with vetted transporters.",
+      metaDescriptionNoRoutes:
+        "Book a full truck in {city}, {state}: see the fare up front and ship with vetted transporters.",
+      eyebrow: "{state}",
+      title: "Truck booking in {city}",
+      lead: "Get a full truck in {city} at a fare you see before you book, carried by a vetted transporter.",
+      widgetTitle: "Get a price from {city}",
+      routesTitle: "Popular routes from {city}",
+      routesLead: "Lanes we run to and from {city}, with distance and fares on each page.",
+      routeLink: "{from} to {to}",
+      trucksTitle: "Trucks you can book in {city}",
+      trucksLead: "{count} truck types, from {smallest} to {largest}.",
+      industriesTitle: "Industries in {city}",
+      industriesSource: "Source: {source}",
+      nearbyTitle: "Nearby cities we serve",
+      nearbyKm: "about {km} km away",
+      faqTitle: "Truck booking in {city}: questions",
+      faq: {
+        trucksQ: "Which trucks can I book in {city}?",
+        trucksA: "{list}. Pick one in the fare widget to see your price.",
+        routesQ: "Which routes from {city} do you run?",
+        routesA:
+          "{list}. For other destinations, enter them in the fare widget; if we can't serve the route yet, we'll call you.",
+        priceQ: "How much does a truck from {city} cost?",
+        priceA:
+          "It depends on distance, truck type and pickup time. Enter your pickup and drop above to see a fare range including GST.",
+        nearbyQ: "Do you also pick up near {city}?",
+        nearbyA:
+          "We serve {list}. Pickups outside these cities may be possible; enter the address and we'll tell you.",
+      },
+    },
+    route: {
+      metaTitle: "{from} to {to} truck booking | {km} km",
+      metaDescription:
+        "Full truck from {from} to {to}: {km} km by road, fares from {fare} incl. GST across {count} truck types. Vetted transporters.",
+      metaDescriptionNoFare:
+        "Full truck from {from} to {to}: {km} km by road. See your fare up front and book a vetted transporter.",
+      eyebrow: "{fromState} to {toState}",
+      title: "Truck booking from {from} to {to}",
+      lead: "{km} km by road. Fares from {fare} for a {truck}, including GST.",
+      leadNoFare: "{km} km by road. Enter your exact addresses to see a fare range.",
+      factsTitle: "{from} to {to} at a glance",
+      facts: {
+        distance: "Road distance",
+        distanceValue: "{km} km",
+        straightLine: "Straight-line distance",
+        transit: "Typical transit",
+        transitValue: "{min}–{max} hours with a {truck}",
+        fareFrom: "Fares from",
+        highways: "Main highways",
+        trucks: "Truck types available",
+      },
+      aboutTitle: "About this lane",
+      about: {
+        distance:
+          "{from} and {to} are {km} km apart by road, {ratio} times the {crow} km straight-line distance between the two cities.",
+        sameState: "Both cities are in {state}, so the trip stays within the state.",
+        crossState:
+          "The trip crosses from {fromState} into {toState}. Inter-state consignments worth more than ₹50,000 generally need an e-way bill under GST rules.",
+        transit:
+          "A {small} usually takes {smallMin}–{smallMax} hours door to door, and a {large} {largeMin}–{largeMax} hours, including loading and driver rest.",
+        fares:
+          "Across {count} truck types, fares on this lane run from {low} to {high}, including {gst}% GST.",
+      },
+      fareTitle: "Fares from {from} to {to} by truck type",
+      fareCaption: "Fare range and transit time for each truck type from {from} to {to}",
+      fareColumns: { truck: "Truck", payload: "Payload", fare: "Fare range", transit: "Transit" },
+      fareNote:
+        "For a daytime pickup booked a week ahead, including {gst}% GST. Night and same-day pickups cost more, and your exact fare depends on the addresses you enter.",
+      includedTitle: "Included in the fare",
+      excludedTitle: "Charged separately",
+      goodsTitle: "Best truck for common goods on this lane",
+      goodsItem:
+        "{goods}, {tonnes} t: {truck} ({payload} t, {length} ft) is the smallest truck that fits.",
+      goodsNone:
+        "{goods}, {tonnes} t: too heavy for one truck. Talk to us about splitting the load.",
+      highwaysTitle: "Highways and tolls",
+      highways: "Trucks on this lane usually run on {highways}.",
+      factsSource: "Lane facts: {source}",
+      widgetTitle: "Get your exact fare",
+      reverseLink: "{to} to {from} instead",
+      relatedTitle: "More routes",
+      cityLink: "Truck booking in {city}",
+      pricingLink: "How our fares work",
+      trucksLink: "Compare truck types",
+    },
   },
   missingFact: {
     label: "Needs from client",
@@ -1497,6 +1602,7 @@ export const en = {
     formTitle: "Raise a grievance or data request",
   },
   notFound: {
+    widgetTitle: "Looking for a truck? Get a price",
     title: "Page not found",
     body: "The page you are looking for does not exist or has moved.",
     cta: "Back to home",

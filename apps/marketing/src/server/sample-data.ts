@@ -231,16 +231,21 @@ export const sampleRateCards: RateCard[] = cardInputs.map(
   }),
 );
 
+/**
+ * Offline stand-ins for local builds without Supabase. The first eight are
+ * the cities the client confirmed (real rows live in Supabase); here every
+ * row is flagged sample because nothing below is read from the database.
+ */
 export const sampleAreas: ServiceArea[] = [
-  ["chennai", "Chennai", "Tamil Nadu", 13.0827, 80.2707, 60],
-  ["bengaluru", "Bengaluru", "Karnataka", 12.9716, 77.5946, 60],
   ["coimbatore", "Coimbatore", "Tamil Nadu", 11.0168, 76.9558, 40],
+  ["tiruppur", "Tiruppur", "Tamil Nadu", 11.1085, 77.3411, 30],
+  ["erode", "Erode", "Tamil Nadu", 11.341, 77.7172, 30],
+  ["salem", "Salem", "Tamil Nadu", 11.6643, 78.146, 35],
+  ["chennai", "Chennai", "Tamil Nadu", 13.0827, 80.2707, 60],
   ["madurai", "Madurai", "Tamil Nadu", 9.9252, 78.1198, 40],
-  ["hyderabad", "Hyderabad", "Telangana", 17.385, 78.4867, 60],
+  ["bengaluru", "Bengaluru", "Karnataka", 12.9716, 77.5946, 60],
   ["kochi", "Kochi", "Kerala", 9.9312, 76.2673, 40],
-  ["vijayawada", "Vijayawada", "Andhra Pradesh", 16.5062, 80.648, 40],
-  ["pune", "Pune", "Maharashtra", 18.5204, 73.8567, 50],
-  ["mumbai", "Mumbai", "Maharashtra", 19.076, 72.8777, 60],
+  ["hyderabad", "Hyderabad", "Telangana", 17.385, 78.4867, 60],
 ].map(([slug, name, state, lat, lng, radiusKm]) => ({
   slug: slug as string,
   name: name as string,
@@ -249,20 +254,45 @@ export const sampleAreas: ServiceArea[] = [
   lng: lng as number,
   radiusKm: radiusKm as number,
   isSample: true,
+  industries: [],
+  factsSource: null,
+  factsReviewed: false,
 }));
 
+const laneDefaults = {
+  isSample: true,
+  highways: [] as string[],
+  tollNote: null,
+  commonGoods: [] as string[],
+  factsSource: null,
+  factsReviewed: false,
+};
+
 export const sampleLanes: Lane[] = [
-  ["chennai", "bengaluru"],
-  ["chennai", "coimbatore"],
-  ["chennai", "hyderabad"],
-  ["chennai", "madurai"],
-  ["bengaluru", "hyderabad"],
-  ["bengaluru", "kochi"],
-  ["coimbatore", "kochi"],
-  ["hyderabad", "vijayawada"],
-  ["bengaluru", "pune"],
-  ["pune", "mumbai"],
-].map(([from, to]) => ({ from: from as string, to: to as string }));
+  // One lane with every fact filled in, so the full route template can be
+  // previewed and tested offline. Sample: never indexed, never in production.
+  {
+    ...laneDefaults,
+    from: "coimbatore",
+    to: "kochi",
+    highways: ["NH 544"],
+    tollNote: "Toll plazas on NH 544; tolls are billed as shown in your estimate.",
+    commonGoods: ["Textile machinery parts:6", "Coir products:4", "FMCG cartons:3"],
+    factsSource: "Sample data for testing",
+    factsReviewed: true,
+  },
+  ...[
+    ["chennai", "bengaluru"],
+    ["chennai", "coimbatore"],
+    ["chennai", "madurai"],
+    ["bengaluru", "kochi"],
+    ["tiruppur", "bengaluru"],
+    ["erode", "chennai"],
+    ["salem", "bengaluru"],
+    ["madurai", "coimbatore"],
+    ["chennai", "hyderabad"],
+  ].map(([from, to]) => ({ ...laneDefaults, from: from as string, to: to as string })),
+];
 
 export const sampleFaqs: Faq[] = [
   [

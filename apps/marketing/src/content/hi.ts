@@ -33,6 +33,7 @@ export const hi: Translation = {
     menuTitle: "मेन्यू",
     menuDescription: "पेज और हमसे संपर्क करने के तरीके",
     quickActions: "त्वरित विकल्प",
+    breadcrumb: "ब्रेडक्रम्ब",
   },
   cta: {
     getPrice: "किराया जानें",
@@ -508,6 +509,7 @@ export const hi: Translation = {
     ],
   },
   notFound: {
+    widgetTitle: "ट्रक चाहिए? किराया जानें",
     title: "पेज नहीं मिला",
     body: "आप जो पेज ढूँढ रहे हैं वह मौजूद नहीं है या हट गया है।",
     cta: "होम पर जाएँ",

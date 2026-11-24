@@ -1,25 +1,12 @@
-import { getContent } from "@/content";
-import { env } from "@/env";
+import { siteGraph } from "@/lib/jsonld";
 
-/** schema.org Organization — helps search engines show the brand panel. */
+/** Organization, WebSite (+ SearchAction) and, once known, LocalBusiness — on every page. */
 export function OrganizationJsonLd() {
-  const { site } = getContent();
-  const data = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: site.name,
-    url: env.NEXT_PUBLIC_SITE_URL,
-    logo: `${env.NEXT_PUBLIC_SITE_URL}/brand/icon-512.png`,
-    description: site.description,
-    areaServed: { "@type": "Country", name: "India" },
-    sameAs: [env.NEXT_PUBLIC_PLAY_STORE_URL],
-  };
-
   return (
     <script
       type="application/ld+json"
       // Escape `<` so a value can never close the script tag (XSS guard).
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }}
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(siteGraph()).replace(/</g, "\\u003c") }}
     />
   );
 }

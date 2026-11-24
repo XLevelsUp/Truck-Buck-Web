@@ -46,6 +46,15 @@ Last reviewed: 2026-11-24.
 | Data requests (access, correction, erasure) and complaints can be filed online.                                                               | `/grievance`, `/help`, `/privacy`              | By construction: the grievance form files `grievance` / `account_deletion` leads.                                                             |
 | We use only a language cookie and Cloudflare Turnstile's security cookies; no advertising or analytics cookies.                               | `/privacy` (draft)                             | By construction, as of 2026-11-24. Re-check when analytics ship (Phase 9); a consent banner is needed only for non-essential cookies.         |
 
+### Phase 7: city and lane pages
+
+| Claim                                                                                            | Where                           | Source                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------ | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TruckBuck serves Coimbatore, Tiruppur, Erode, Salem, Chennai, Madurai, Bengaluru and Kochi.      | `/truck-booking/<city>`, hub    | Client confirmation, 2026-11-24 (NFC-3).                                                                                                             |
+| Road distance, transit times and fares per truck type on a lane.                                 | `/truck-booking/<from>-to-<to>` | Computed: Google Routes distance + `priceQuote` on the lane's rate cards. Noindex until both are real (no straight-line estimates, no sample rates). |
+| "Inter-state consignments worth more than ₹50,000 generally need an e-way bill under GST rules." | Cross-state lane pages          | CGST Rules, 2017, Rule 138 (https://cbic-gst.gov.in). Worded "generally" because exemptions exist.                                                   |
+| Highways, toll note and common goods per lane; industries per city.                              | Lane and city pages             | Ops facts in `lanes` / `service_areas`, shown only when `facts_reviewed` with a `facts_source` (NFC-3, NFC-15).                                      |
+
 ## Gated until confirmed
 
 | Claim                                                      | Switch                                                             | Waiting on                                |

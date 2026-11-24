@@ -44,6 +44,8 @@ export class GeoUnavailableError extends Error {
 }
 
 const SAMPLE_PREFIX = "sample:";
+/** A served city's centre, e.g. "area:coimbatore" (city and lane pages prefill the widget with these). */
+export const AREA_PREFIX = "area:";
 const ROAD_FACTOR = 1.3;
 
 function googleEnabled(): boolean {
@@ -147,6 +149,13 @@ export async function placeDetails(
   sessionToken?: string,
 ): Promise<PlaceDetails | null> {
   ensureAvailable();
+  if (placeId.startsWith(AREA_PREFIX)) {
+    const { areas } = await getCatalog();
+    const area = areas.find((a) => `${AREA_PREFIX}${a.slug}` === placeId);
+    return area
+      ? { placeId, label: `${area.name}, ${area.state}`, lat: area.lat, lng: area.lng }
+      : null;
+  }
   if (placeId.startsWith(SAMPLE_PREFIX)) {
     if (!serverEnv.allowSampleData) return null;
     const { areas } = await getCatalog();
@@ -235,6 +244,14 @@ export async function reverseGeocode(lat: number, lng: number): Promise<PlaceDet
 
 export async function routeInfo(from: PlaceDetails, to: PlaceDetails): Promise<RouteInfo> {
   ensureAvailable();
+  // City centres have no Google place id: route between their coordinates.
+  if (from.placeId.startsWith(AREA_PREFIX) || to.placeId.startsWith(AREA_PREFIX)) {
+    const { distanceKm, durationMinutes } = await areaRoute(
+      { slug: from.placeId, lat: from.lat, lng: from.lng },
+      { slug: to.placeId, lat: to.lat, lng: to.lng },
+    );
+    return { distanceKm, durationMinutes };
+  }
   if (
     !googleEnabled() ||
     from.placeId.startsWith(SAMPLE_PREFIX) ||
@@ -293,6 +310,92 @@ export async function routeInfo(from: PlaceDetails, to: PlaceDetails): Promise<R
     });
   }
   return { distanceKm: element.distanceMeters / 1000, durationMinutes: Math.round(durationS / 60) };
+}
+
+/* ------------------------------------------------------------------------ */
+/* City-to-city distance for programmatic lane pages                        */
+/* ------------------------------------------------------------------------ */
+
+export interface AreaRoute extends RouteInfo {
+  /** "google" = Routes API road distance; "estimate" = straight line × 1.3 (not publishable). */
+  source: "google" | "estimate";
+}
+
+/**
+ * Road distance between two service-area centres. Uses the Routes API when
+ * a key is configured (cached ≤ 30 days like every lookup); otherwise a
+ * straight-line estimate, which lane pages treat as incomplete data.
+ */
+export async function areaRoute(
+  from: { slug: string; lat: number; lng: number },
+  to: { slug: string; lat: number; lng: number },
+): Promise<AreaRoute> {
+  if (!googleEnabled()) {
+    const km = haversineKm(from, to) * ROAD_FACTOR;
+    return {
+      distanceKm: Math.round(km * 10) / 10,
+      durationMinutes: Math.round((km / 45) * 60),
+      source: "estimate",
+    };
+  }
+  const originId = `area:${from.slug}`;
+  const destinationId = `area:${to.slug}`;
+  const db = getSupabase();
+  if (db) {
+    const { data } = await db
+      .from("distance_cache")
+      .select("distance_m,duration_s")
+      .eq("origin_id", originId)
+      .eq("destination_id", destinationId)
+      .gte("fetched_at", new Date(Date.now() - 30 * 86_400_000).toISOString())
+      .maybeSingle();
+    if (data) {
+      const row = data;
+      return {
+        distanceKm: row.distance_m / 1000,
+        durationMinutes: Math.round(row.duration_s / 60),
+        source: "google",
+      };
+    }
+  }
+  type Element = { distanceMeters?: number; duration?: string; condition?: string };
+  const point = (p: { lat: number; lng: number }) => ({
+    waypoint: { location: { latLng: { latitude: p.lat, longitude: p.lng } } },
+  });
+  const elements = await googleFetch<Element[]>(
+    "https://routes.googleapis.com/distanceMatrix/v2:computeRouteMatrix",
+    {
+      method: "POST",
+      fieldMask: "originIndex,destinationIndex,distanceMeters,duration,condition",
+      body: JSON.stringify({
+        origins: [point(from)],
+        destinations: [point(to)],
+        travelMode: "DRIVE",
+        routingPreference: "TRAFFIC_UNAWARE",
+        regionCode: "IN",
+      }),
+    },
+  );
+  const element = elements[0];
+  if (!element || element.condition !== "ROUTE_EXISTS" || element.distanceMeters === undefined) {
+    throw new NoRouteError();
+  }
+  const durationS = Number.parseInt(element.duration ?? "0", 10);
+  if (db) {
+    await db.from("distance_cache").upsert({
+      origin_id: originId,
+      destination_id: destinationId,
+      distance_m: element.distanceMeters,
+      duration_s: durationS,
+      provider: "google-routes",
+      fetched_at: new Date().toISOString(),
+    });
+  }
+  return {
+    distanceKm: element.distanceMeters / 1000,
+    durationMinutes: Math.round(durationS / 60),
+    source: "google",
+  };
 }
 
 export class NoRouteError extends Error {

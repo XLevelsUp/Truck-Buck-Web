@@ -33,6 +33,7 @@ export const ta: Translation = {
     menuTitle: "மெனு",
     menuDescription: "பக்கங்கள் மற்றும் எங்களைத் தொடர்புகொள்ளும் வழிகள்",
     quickActions: "விரைவுச் செயல்கள்",
+    breadcrumb: "வழிச்சுவடு",
   },
   cta: {
     getPrice: "கட்டணம் அறிய",
@@ -545,6 +546,7 @@ export const ta: Translation = {
     ],
   },
   notFound: {
+    widgetTitle: "லாரி தேவையா? கட்டணம் அறியுங்கள்",
     title: "பக்கம் கிடைக்கவில்லை",
     body: "நீங்கள் தேடும் பக்கம் இல்லை அல்லது மாற்றப்பட்டுள்ளது.",
     cta: "முகப்புக்குச் செல்",

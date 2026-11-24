@@ -46,10 +46,16 @@ export function HelpSearch({
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Uncontrolled input: text typed before hydration (slow phones) is kept and searched.
+  // Uncontrolled input: text typed before hydration (slow phones) is kept and
+  // searched. Otherwise ?q= (the site search box in Google results) fills it.
   useEffect(() => {
-    const typed = inputRef.current?.value ?? "";
-    if (typed) queueMicrotask(() => setQuery(typed));
+    const input = inputRef.current;
+    if (!input) return;
+    const fromUrl = new URLSearchParams(window.location.search).get("q")?.slice(0, 100) ?? "";
+    const initial = input.value || fromUrl;
+    if (!initial) return;
+    input.value = initial;
+    queueMicrotask(() => setQuery(initial));
   }, []);
   const deferred = useDeferredValue(query.trim());
   const fuse = useMemo(

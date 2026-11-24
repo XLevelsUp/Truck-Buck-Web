@@ -3,9 +3,9 @@ import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Button } from "@truckbuck/ui/button";
 import { Logo } from "@truckbuck/ui/logo";
 
+import { NotFoundContent } from "@/components/not-found-content";
 import { getContent } from "@/content";
 
 import { fontVariables } from "./fonts";
@@ -32,16 +32,8 @@ export default function GlobalNotFound() {
             </Link>
           </div>
         </header>
-        <main
-          id="main"
-          className="mx-auto grid w-full max-w-(--container-prose) flex-1 content-center justify-items-start gap-4 page-gutter py-24"
-        >
-          <p className="text-sm font-semibold text-link">404</p>
-          <h1 className="text-4xl font-bold">{notFound.title}</h1>
-          <p className="text-muted-foreground">{notFound.body}</p>
-          <Button asChild className="mt-4">
-            <Link href="/">{notFound.cta}</Link>
-          </Button>
+        <main id="main" className="flex-1">
+          <NotFoundContent />
         </main>
       </body>
     </html>

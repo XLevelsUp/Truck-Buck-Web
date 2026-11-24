@@ -63,6 +63,20 @@ interface AreaRow {
   lng: number;
   radius_km: number;
   is_sample: boolean;
+  industries: string[] | null;
+  facts_source: string | null;
+  facts_reviewed: boolean | null;
+}
+
+interface LaneRow {
+  from_slug: string;
+  to_slug: string;
+  is_sample: boolean;
+  highways: string[] | null;
+  toll_note: string | null;
+  common_goods: string[] | null;
+  facts_source: string | null;
+  facts_reviewed: boolean | null;
 }
 
 export async function getCatalog(): Promise<Catalog> {
@@ -87,10 +101,15 @@ export async function getCatalog(): Promise<Catalog> {
       .order("sort_order"),
     db
       .from("service_areas")
-      .select("slug,name,state,lat,lng,radius_km,is_sample")
+      .select("slug,name,state,lat,lng,radius_km,is_sample,industries,facts_source,facts_reviewed")
       .eq("active", true)
       .order("name"),
-    db.from("lanes").select("from_slug,to_slug,is_sample").eq("active", true),
+    db
+      .from("lanes")
+      .select(
+        "from_slug,to_slug,is_sample,highways,toll_note,common_goods,facts_source,facts_reviewed",
+      )
+      .eq("active", true),
   ]);
   for (const result of [trucksResult, areasResult, lanesResult]) {
     if (result.error) throw new Error(`Catalog query failed: ${result.error.message}`);
@@ -98,9 +117,7 @@ export async function getCatalog(): Promise<Catalog> {
 
   const trucks = pick((trucksResult.data ?? []) as TruckRow[]);
   const areas = pick((areasResult.data ?? []) as AreaRow[]);
-  const lanes = pick(
-    (lanesResult.data ?? []) as { from_slug: string; to_slug: string; is_sample: boolean }[],
-  );
+  const lanes = pick((lanesResult.data ?? []) as LaneRow[]);
   const areaSlugs = new Set(areas.rows.map((a) => a.slug));
 
   return {
@@ -129,10 +146,22 @@ export async function getCatalog(): Promise<Catalog> {
       lng: row.lng,
       radiusKm: row.radius_km,
       isSample: row.is_sample,
+      industries: row.industries ?? [],
+      factsSource: row.facts_source,
+      factsReviewed: row.facts_reviewed ?? false,
     })),
     lanes: lanes.rows
       .filter((row) => areaSlugs.has(row.from_slug) && areaSlugs.has(row.to_slug))
-      .map((row): Lane => ({ from: row.from_slug, to: row.to_slug })),
+      .map((row): Lane => ({
+        from: row.from_slug,
+        to: row.to_slug,
+        isSample: row.is_sample,
+        highways: row.highways ?? [],
+        tollNote: row.toll_note,
+        commonGoods: row.common_goods ?? [],
+        factsSource: row.facts_source,
+        factsReviewed: row.facts_reviewed ?? false,
+      })),
     usesSampleData: trucks.sample || areas.sample || lanes.sample,
   };
 }

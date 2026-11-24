@@ -32,11 +32,23 @@ export interface ServiceArea {
   lng: number;
   radiusKm: number;
   isSample: boolean;
+  /** Industries in the city, shown only when reviewed with a source (NFC-15). */
+  industries: string[];
+  factsSource: string | null;
+  factsReviewed: boolean;
 }
 
 export interface Lane {
   from: string;
   to: string;
+  isSample: boolean;
+  /** Ops knowledge, shown only when reviewed with a source (NFC-3). */
+  highways: string[];
+  tollNote: string | null;
+  /** "name:tonnes" pairs, e.g. "Cotton yarn:9". */
+  commonGoods: string[];
+  factsSource: string | null;
+  factsReviewed: boolean;
 }
 
 export interface Faq {

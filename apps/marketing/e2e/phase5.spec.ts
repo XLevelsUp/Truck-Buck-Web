@@ -3,6 +3,7 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { LOCALE_COOKIE, prefixedLocales, translationReview } from "../src/i18n/locales";
 import { isLocaleIndexable, isLocalePublished } from "../src/i18n/publishing";
+import { allSitemapXml } from "./sitemaps";
 
 /*
  * Phase 5: localisation, visuals and content rules.
@@ -93,7 +94,7 @@ test("hreflang lists only reviewed languages", async ({ page }) => {
 });
 
 test("sitemap leaves out unreviewed translations", async ({ request }) => {
-  const xml = await (await request.get("/sitemap.xml")).text();
+  const xml = await allSitemapXml(request);
   for (const locale of prefixedLocales) {
     for (const path of ["", "/drivers", "/transporters"]) {
       const listed = xml.includes(`/${locale}${path}</loc>`);

@@ -36,6 +36,16 @@ const schema = z.object({
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1).optional(),
   /** Referrer-restricted Maps Embed API key for the tap-to-open interactive map. Unset = link out to Google Maps. */
   NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY: z.string().min(1).optional(),
+  /** Google Search Console "HTML tag" token (the content value only). Unset = no tag. */
+  NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION: z
+    .string()
+    .regex(/^[\w-]+$/)
+    .optional(),
+  /** Bing Webmaster Tools msvalidate.01 token. Unset = no tag. */
+  NEXT_PUBLIC_BING_SITE_VERIFICATION: z
+    .string()
+    .regex(/^[\w-]+$/)
+    .optional(),
 });
 
 /**
@@ -62,6 +72,9 @@ const parsed = schema.safeParse({
     // Cloudflare's documented always-pass test key, outside production only.
     (process.env.VERCEL_ENV === "production" ? undefined : "1x00000000000000000000AA"),
   NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_KEY || undefined,
+  NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION:
+    process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
+  NEXT_PUBLIC_BING_SITE_VERIFICATION: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || undefined,
 });
 
 if (!parsed.success) {

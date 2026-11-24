@@ -18,7 +18,11 @@ test("home page renders with SEO essentials and security headers", async ({ page
   );
 
   const jsonLd = await page.locator('script[type="application/ld+json"]').allTextContents();
-  const types = jsonLd.map((text) => (JSON.parse(text) as { "@type": string })["@type"]);
+  // Nodes may be wrapped in a schema.org @graph.
+  const types = jsonLd.flatMap((text) => {
+    const data = JSON.parse(text) as { "@type"?: string; "@graph"?: { "@type": string }[] };
+    return data["@graph"] ? data["@graph"].map((node) => node["@type"]) : [data["@type"]];
+  });
   expect(types).toEqual(expect.arrayContaining(["Organization", "FAQPage"]));
 });
 

@@ -4,6 +4,7 @@ import { expect, type Page, test } from "@playwright/test";
 import { company } from "../src/content/company";
 import { featureStatus } from "../src/content/features";
 import { launchProblems } from "../src/launch-check";
+import { allSitemapXml } from "./sitemaps";
 
 /*
  * Phase 6: trust, safety, company and support pages.
@@ -159,7 +160,7 @@ test("header Help goes to the help centre", async ({ page }) => {
 });
 
 test("sitemap lists the Phase 6 pages and every help answer", async ({ request }) => {
-  const xml = await (await request.get("/sitemap.xml")).text();
+  const xml = await allSitemapXml(request);
   for (const path of [...pages, "/help/are-tolls-included"]) {
     expect(xml, path).toContain(`${path}</loc>`);
   }

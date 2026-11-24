@@ -61,6 +61,8 @@ interface EstimateWidgetProps {
   config: WidgetConfig;
   /** Truck chosen up front, e.g. on a /trucks/[slug] page. */
   preselectedTruck?: string;
+  /** Places filled in up front, e.g. on /truck-booking pages ("area:<slug>" ids). */
+  prefill?: { from?: Place; to?: Place };
 }
 
 // Result + lead step load only once someone asks for a price: they are not
@@ -80,7 +82,7 @@ const noopSubscribe = () => () => {};
  * and price themselves. Reading location after hydration (instead of
  * useSearchParams + Suspense) avoids rendering the widget twice on load.
  */
-export function EstimateWidget({ labels, config, preselectedTruck }: EstimateWidgetProps) {
+export function EstimateWidget({ labels, config, preselectedTruck, prefill }: EstimateWidgetProps) {
   const w = labels.widget;
   const today = useTodayIST();
   const search = useSyncExternalStore(
@@ -89,8 +91,8 @@ export function EstimateWidget({ labels, config, preselectedTruck }: EstimateWid
     () => "",
   );
 
-  const [from, setFrom] = useState<Place | null>(null);
-  const [to, setTo] = useState<Place | null>(null);
+  const [from, setFrom] = useState<Place | null>(prefill?.from ?? null);
+  const [to, setTo] = useState<Place | null>(prefill?.to ?? null);
   const [truck, setTruck] = useState<string | null>(preselectedTruck ?? null);
   const [date, setDate] = useState("");
   const [initial, setInitial] = useState<InitialState>(EMPTY);

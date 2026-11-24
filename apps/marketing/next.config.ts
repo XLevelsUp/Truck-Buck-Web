@@ -5,6 +5,7 @@ import { join } from "node:path";
 
 import type { NextConfig } from "next";
 
+import { legacyRedirects } from "./src/content/redirects.ts";
 import { assertLaunchReady } from "./src/launch-check.ts";
 import { securityHeaders } from "./src/lib/security-headers.ts";
 
@@ -45,6 +46,10 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  // Old truckbuck.in URLs → new pages (NFC-20). Permanent, so rankings carry over.
+  redirects() {
+    return Promise.resolve(legacyRedirects.map((redirect) => ({ ...redirect, permanent: true })));
   },
   headers() {
     return Promise.resolve([

@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page, test } from "@playwright/test";
 
 import { isLocaleIndexable } from "../src/i18n/publishing";
+import { allSitemapXml } from "./sitemaps";
 
 /*
  * Phase 4: audience pages, truck catalogue, pricing, how it works.
@@ -178,8 +179,10 @@ test("truck detail: specs, prefilled quote, schema, no layout shift", async ({ p
   const schema = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(
     "",
   );
-  expect(schema).toContain('"@type":"Product"');
+  // Product needs an offer for rich results, so sample trucks (no real rate card) have none.
+  expect(schema).not.toContain('"@type":"Product"');
   expect(schema).toContain('"@type":"Service"');
+  expect(schema).toContain('"@type":"BreadcrumbList"');
 
   const cls = await page.evaluate(
     () =>
@@ -229,7 +232,7 @@ test("new pages each carry one FAQPage schema", async ({ page }) => {
 });
 
 test("sitemap lists the new pages", async ({ request }) => {
-  const xml = await (await request.get("/sitemap.xml")).text();
+  const xml = await allSitemapXml(request);
   for (const path of [
     "/shippers",
     "/transporters",

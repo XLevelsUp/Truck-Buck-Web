@@ -34,6 +34,19 @@ export function baseMetadata(locale: Locale): Metadata {
     },
     twitter: { card: "summary_large_image" },
     formatDetection: { telephone: false },
+    // Search Console / Bing Webmaster verification, only when the tokens are set.
+    ...(env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+      ? {
+          verification: {
+            ...(env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+              ? { google: env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+              : {}),
+            ...(env.NEXT_PUBLIC_BING_SITE_VERIFICATION
+              ? { other: { "msvalidate.01": env.NEXT_PUBLIC_BING_SITE_VERIFICATION } }
+              : {}),
+          },
+        }
+      : {}),
     // Draft translations are previewable but never indexed (NFC-22).
     ...(locale !== "en" && !translationReview[locale].reviewed
       ? { robots: { index: false, follow: false } }

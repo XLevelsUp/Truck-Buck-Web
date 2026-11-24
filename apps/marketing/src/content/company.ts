@@ -21,6 +21,8 @@ export const company = {
   callbackMinutes: 15 as number | null,
   /** NFC-14 */
   social: [] as { label: string; href: string }[],
+  /** NFC-4 — registered office coordinates, for LocalBusiness structured data. */
+  officeGeo: null as { lat: number; lng: number } | null,
   /** NFC-4 — four-digit year, e.g. 2024 */
   foundedYear: null as number | null,
   /** NFC-23 — Udyam registration number and DPIIT recognition number, if any. */

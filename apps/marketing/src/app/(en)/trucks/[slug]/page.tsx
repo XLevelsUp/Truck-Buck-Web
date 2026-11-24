@@ -6,6 +6,7 @@ import { Badge } from "@truckbuck/ui/badge";
 import { Button } from "@truckbuck/ui/button";
 import { TruckCard } from "@truckbuck/ui/truck-card";
 
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { EstimateWidget } from "@/components/estimate/estimate-widget";
 import { widgetProps } from "@/components/estimate/widget-props";
 import { JsonLd, PageFaq } from "@/components/page/page-blocks";
@@ -19,6 +20,7 @@ import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo";
 import { getCatalog } from "@/server/catalog";
 import type { TruckType } from "@/server/catalog-types";
+import { getMinimumFare } from "@/server/lane-facts";
 
 /** Every catalogue truck is prerendered at build time. */
 export async function generateStaticParams() {
@@ -72,18 +74,20 @@ export default async function TruckPage({ params }: PageProps<"/trucks/[slug]">)
   const related = relatedTrucks(truck, trucks);
   const { labels, config } = widgetProps(trucks);
   const url = `${env.NEXT_PUBLIC_SITE_URL}/trucks/${truck.slug}`;
+  // Product rich results need an offer: only with a real rate card (see getMinimumFare).
+  const minimumFare = truck.isSample ? null : await getMinimumFare(truck.slug);
 
   return (
     <>
       <section aria-labelledby="page-title" className="border-b">
         <div className="mx-auto grid max-w-(--container-content) gap-8 page-gutter py-10 md:grid-cols-2 md:items-start md:py-14">
           <div className="grid content-start gap-4">
-            <Link
-              href={routes.trucks.path}
-              className="w-fit rounded-sm text-link underline underline-offset-4 focus-ring"
-            >
-              {content.trucksPage.title}
-            </Link>
+            <Breadcrumbs
+              trail={[
+                { name: content.trucksPage.title, path: routes.trucks.path },
+                { name: truck.name, path: `/trucks/${truck.slug}` },
+              ]}
+            />
             <h1 id="page-title" className="text-5xl font-extrabold">
               {truck.name}
             </h1>
@@ -181,21 +185,31 @@ export default async function TruckPage({ params }: PageProps<"/trucks/[slug]">)
 
       <JsonLd
         data={[
-          {
-            "@context": "https://schema.org",
-            "@type": "Product",
-            name: truck.name,
-            description: truck.goodFor ?? undefined,
-            category: "Truck hire (full truck load)",
-            url,
-            ...(truck.imageUrl ? { image: truck.imageUrl } : {}),
-            brand: { "@type": "Brand", name: content.site.name },
-            additionalProperty: specs.map((spec) => ({
-              "@type": "PropertyValue",
-              name: spec.label,
-              value: spec.value,
-            })),
-          },
+          ...(minimumFare === null
+            ? []
+            : [
+                {
+                  "@context": "https://schema.org",
+                  "@type": "Product",
+                  offers: {
+                    "@type": "AggregateOffer",
+                    priceCurrency: "INR",
+                    lowPrice: Math.round(minimumFare / 100),
+                    offerCount: 1,
+                  },
+                  name: truck.name,
+                  description: truck.goodFor ?? undefined,
+                  category: "Truck hire (full truck load)",
+                  url,
+                  ...(truck.imageUrl ? { image: truck.imageUrl } : {}),
+                  brand: { "@type": "Brand", name: content.site.name },
+                  additionalProperty: specs.map((spec) => ({
+                    "@type": "PropertyValue",
+                    name: spec.label,
+                    value: spec.value,
+                  })),
+                },
+              ]),
           {
             "@context": "https://schema.org",
             "@type": "Service",
