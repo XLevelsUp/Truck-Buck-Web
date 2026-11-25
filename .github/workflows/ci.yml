@@ -38,7 +38,7 @@ jobs:
           # Full history so `turbo --affected` can diff against the base branch.
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6.1.0 # version read from package.json "packageManager"
+      - uses: pnpm/action-setup@v6.1.1 # version read from package.json "packageManager"
 
       - uses: actions/setup-node@v7.1.0
         with:
@@ -78,7 +78,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v6.1.0
+      - uses: pnpm/action-setup@v6.1.1
 
       - uses: actions/setup-node@v7.1.0
         with:
@@ -120,7 +120,7 @@ jobs:
   #   environment: production
   #   steps:
   #     - uses: actions/checkout@v7.0.1
-  #     - uses: pnpm/action-setup@v6.1.0
+  #     - uses: pnpm/action-setup@v6.1.1
   #     - uses: actions/setup-node@v7.1.0
   #       with: { node-version-file: .nvmrc, cache: pnpm }
   #     - run: pnpm dlx vercel@latest pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
