@@ -101,11 +101,15 @@ export function TruckPicker({
           );
         })}
       </div>
-      {error ? (
-        <p id={errorId} className="text-sm font-medium text-danger">
-          {error}
-        </p>
-      ) : null}
+      {/* Live region always present (display: contents, so no layout box) so the
+          error is announced as it appears, not only when focus reaches the field. */}
+      <div aria-live="polite" aria-atomic="true" className="contents">
+        {error ? (
+          <p id={errorId} className="text-sm font-medium text-danger">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </fieldset>
   );
 }

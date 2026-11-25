@@ -3,6 +3,7 @@ import "../globals.css";
 import type { Metadata, Viewport } from "next";
 
 import { baseMetadata, SiteShell, siteViewport } from "@/components/site-shell";
+import { getContent } from "@/content";
 import { isPrefixedLocale, prefixedLocales } from "@/i18n/locales";
 
 /** Root layout for translated pages: /hi/… and /ta/… (own <html lang>). */
@@ -12,7 +13,14 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
-  return isPrefixedLocale(locale) ? baseMetadata(locale) : {};
+  if (isPrefixedLocale(locale)) return baseMetadata(locale);
+  // Unknown first segment (/no-such-page): the 404 still needs a title.
+  const { notFound, site } = getContent();
+  return {
+    ...baseMetadata("en"),
+    title: `${notFound.title} | ${site.name}`,
+    robots: { index: false },
+  };
 }
 
 export const viewport: Viewport = siteViewport;

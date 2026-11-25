@@ -14,7 +14,9 @@ import { formatIndianMobile, normalizeIndianMobile } from "@truckbuck/utils";
 import { submitQuoteLead } from "@/app/actions/quote-lead";
 import { readUtm } from "@/components/forms/attribution";
 import { Turnstile } from "@/components/forms/turnstile";
+import { track } from "@/lib/analytics";
 import { fill } from "@/lib/format";
+import { markLeadSent } from "@/lib/lead-sent";
 
 import type { WidgetLabels } from "./labels";
 
@@ -46,6 +48,8 @@ export function LeadForm({
   const [submittedPhone, setSubmittedPhone] = useState("");
   const token = useRef<string | null>(null);
   const waiters = useRef<((value: string | null) => void)[]>([]);
+  // Tokens are single-use: after each submit the widget is re-rendered for a new one.
+  const [generation, setGeneration] = useState(0);
 
   function onToken(value: string | null) {
     token.current = value;
@@ -94,6 +98,10 @@ export function LeadForm({
     startTransition(async () => {
       setVerifying(!token.current && Boolean(turnstileSiteKey));
       const turnstileToken = await waitForToken();
+      if (turnstileToken) {
+        token.current = null;
+        setGeneration((g) => g + 1);
+      }
       setVerifying(false);
       const outcome = await submitQuoteLead({
         estimate: request,
@@ -106,7 +114,11 @@ export function LeadForm({
         referrer: document.referrer || undefined,
         locale,
       }).catch((): LeadResult => ({ ok: false, reason: "unavailable" }));
-      if (outcome.ok) setSubmittedPhone(formatIndianMobile(phone) ?? phone);
+      if (outcome.ok) {
+        setSubmittedPhone(formatIndianMobile(phone) ?? phone);
+        track("callback_submitted", { truck: request.truck, served: outcome.served });
+        markLeadSent();
+      }
       setResult(outcome);
     });
   }
@@ -156,7 +168,13 @@ export function LeadForm({
       : null;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="grid gap-4" aria-busy={pending || undefined}>
+    <form
+      data-clarity-mask="true"
+      onSubmit={onSubmit}
+      noValidate
+      className="grid gap-4"
+      aria-busy={pending || undefined}
+    >
       <Field label={labels.lead.name} error={fieldErrors?.name}>
         {(control) => (
           <Input
@@ -182,7 +200,12 @@ export function LeadForm({
       </div>
 
       {turnstileSiteKey ? (
-        <Turnstile siteKey={turnstileSiteKey} onToken={onToken} action="quote_lead" />
+        <Turnstile
+          key={generation}
+          siteKey={turnstileSiteKey}
+          onToken={onToken}
+          action="quote_lead"
+        />
       ) : null}
 
       {formError ? (

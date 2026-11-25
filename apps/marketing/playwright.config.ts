@@ -15,6 +15,23 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: "on-first-retry",
+    // Analytics consent already answered ("no"), so the consent banner doesn't
+    // cover the page in older specs. e2e/phase9.spec.ts clears it to test the banner.
+    storageState: {
+      cookies: [
+        {
+          name: "tb_consent",
+          value: "denied",
+          domain: "localhost",
+          path: "/",
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: "Lax",
+        },
+      ],
+      origins: [],
+    },
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   // Runs against the production build via `next start` (turbo runs `build` first).

@@ -1,5 +1,6 @@
 "use server";
 
+import { headers } from "next/headers";
 import { after } from "next/server";
 
 import {
@@ -13,15 +14,15 @@ import {
 import { isValidGstin, normalizeGstin } from "@truckbuck/utils";
 
 import { getContent } from "@/content";
+import { conversionContext } from "@/server/ga4";
 import {
-  annotateLead,
   fieldErrorsFrom,
   guardLead,
   insertLead,
   LEAD_CONSENT_VERSION,
   referenceFor,
 } from "@/server/leads";
-import { sendTransporterAck } from "@/server/whatsapp-cloud";
+import { type LeadRow, processNewLead } from "@/server/notify";
 
 function common(input: {
   utm: Record<string, string | undefined>;
@@ -38,6 +39,20 @@ function common(input: {
     consent_text_version: LEAD_CONSENT_VERSION,
     status: "new",
   };
+}
+
+/**
+ * Saves the lead, answers the visitor with their reference at once, then
+ * (after the response) alerts ops on WhatsApp + email, appends the Sheet row,
+ * acknowledges the customer on WhatsApp and sends the GA4 conversion.
+ */
+async function saveAndNotify(row: LeadRow, ack: "ack" | "transporter" | null): Promise<LeadResult> {
+  const conversion = conversionContext((await headers()).get("cookie"));
+  const saved = await insertLead(row);
+  if (!saved) return { ok: false, reason: "unavailable" };
+  const reference = referenceFor(saved.id);
+  after(() => processNewLead(saved.id, reference, row, { ack, conversion }));
+  return { ok: true, reference, served: true };
 }
 
 /** /transporters — 2-step application. type = "transporter", status = "new". */
@@ -60,31 +75,29 @@ export async function submitTransporterLead(input: unknown): Promise<LeadResult>
     };
   }
   const lead = parsed.data;
-  const guard = await guardLead({ ...lead, phoneError: getContent(lead.locale).forms.phoneError });
+  const guard = await guardLead({
+    ...lead,
+    phoneError: getContent(lead.locale).forms.phoneError,
+    action: "transporter_apply",
+  });
   if (!guard.ok) return guard.result;
 
-  const saved = await insertLead({
-    type: "transporter",
-    name: lead.name,
-    phone_e164: guard.phoneE164,
-    city: lead.city,
-    details: {
-      fleet_size: lead.fleetSize,
-      truck_types: lead.truckTypes,
-      home_base: lead.homeBase,
-      lanes: lead.lanes ?? null,
+  return saveAndNotify(
+    {
+      type: "transporter",
+      name: lead.name,
+      phone_e164: guard.phoneE164,
+      city: lead.city,
+      details: {
+        fleet_size: lead.fleetSize,
+        truck_types: lead.truckTypes,
+        home_base: lead.homeBase,
+        lanes: lead.lanes ?? null,
+      },
+      ...common(lead),
     },
-    ...common(lead),
-  });
-  if (!saved) return { ok: false, reason: "unavailable" };
-
-  const reference = referenceFor(saved.id);
-  // Acknowledge on WhatsApp after the response is sent; record the outcome on the lead.
-  after(async () => {
-    const outcome = await sendTransporterAck(guard.phoneE164, reference, lead.locale);
-    await annotateLead(saved.id, { whatsapp_ack: outcome });
-  });
-  return { ok: true, reference, served: true };
+    "transporter",
+  );
 }
 
 /** /shippers — business account request. type = "business". */
@@ -117,25 +130,29 @@ export async function submitBusinessLead(input: unknown): Promise<LeadResult> {
     };
   }
   const lead = parsed.data;
-  const guard = await guardLead({ ...lead, phoneError: content.forms.phoneError });
+  const guard = await guardLead({
+    ...lead,
+    phoneError: content.forms.phoneError,
+    action: "business_account",
+  });
   if (!guard.ok) return guard.result;
 
-  const saved = await insertLead({
-    type: "business",
-    name: lead.name,
-    phone_e164: guard.phoneE164,
-    email: lead.email || null,
-    company: lead.company,
-    details: {
-      gstin: lead.gstin ? normalizeGstin(lead.gstin) : null,
-      monthly_trips: lead.monthlyTrips,
-      lanes: lead.lanes,
+  return saveAndNotify(
+    {
+      type: "business",
+      name: lead.name,
+      phone_e164: guard.phoneE164,
+      email: lead.email || null,
+      company: lead.company,
+      details: {
+        gstin: lead.gstin ? normalizeGstin(lead.gstin) : null,
+        monthly_trips: lead.monthlyTrips,
+        lanes: lead.lanes,
+      },
+      ...common(lead),
     },
-    ...common(lead),
-  });
-  return saved
-    ? { ok: true, reference: referenceFor(saved.id), served: true }
-    : { ok: false, reason: "unavailable" };
+    "ack",
+  );
 }
 
 /** /drivers (+ /hi, /ta) — rewards waitlist. type = "driver_waitlist". */
@@ -161,20 +178,24 @@ export async function submitDriverWaitlist(input: unknown): Promise<LeadResult> 
     };
   }
   const lead = parsed.data;
-  const guard = await guardLead({ ...lead, phoneError: getContent(lead.locale).forms.phoneError });
+  const guard = await guardLead({
+    ...lead,
+    phoneError: getContent(lead.locale).forms.phoneError,
+    action: "driver_waitlist",
+  });
   if (!guard.ok) return guard.result;
 
-  const saved = await insertLead({
-    type: "driver_waitlist",
-    name: lead.name,
-    phone_e164: guard.phoneE164,
-    city: lead.city,
-    details: { transporter: lead.transporter ?? null, programme: "safe_driving_rewards" },
-    ...common(lead),
-  });
-  return saved
-    ? { ok: true, reference: referenceFor(saved.id), served: true }
-    : { ok: false, reason: "unavailable" };
+  return saveAndNotify(
+    {
+      type: "driver_waitlist",
+      name: lead.name,
+      phone_e164: guard.phoneE164,
+      city: lead.city,
+      details: { transporter: lead.transporter ?? null, programme: "safe_driving_rewards" },
+      ...common(lead),
+    },
+    null,
+  );
 }
 
 /** /contact — general enquiry, routed by topic (shipper / transporter / press / other). */
@@ -195,21 +216,25 @@ export async function submitContactLead(input: unknown): Promise<LeadResult> {
     };
   }
   const lead = parsed.data;
-  const guard = await guardLead({ ...lead, phoneError: content.forms.phoneError });
+  const guard = await guardLead({
+    ...lead,
+    phoneError: content.forms.phoneError,
+    action: "contact",
+  });
   if (!guard.ok) return guard.result;
 
-  const saved = await insertLead({
-    type: "contact",
-    name: lead.name,
-    phone_e164: guard.phoneE164,
-    email: lead.email || null,
-    company: lead.company || null,
-    details: { topic: lead.topic, message: lead.message },
-    ...common(lead),
-  });
-  return saved
-    ? { ok: true, reference: referenceFor(saved.id), served: true }
-    : { ok: false, reason: "unavailable" };
+  return saveAndNotify(
+    {
+      type: "contact",
+      name: lead.name,
+      phone_e164: guard.phoneE164,
+      email: lead.email || null,
+      company: lead.company || null,
+      details: { topic: lead.topic, message: lead.message },
+      ...common(lead),
+    },
+    "ack",
+  );
 }
 
 /**
@@ -234,18 +259,22 @@ export async function submitGrievance(input: unknown): Promise<LeadResult> {
     };
   }
   const lead = parsed.data;
-  const guard = await guardLead({ ...lead, phoneError: content.forms.phoneError });
+  const guard = await guardLead({
+    ...lead,
+    phoneError: content.forms.phoneError,
+    action: "grievance",
+  });
   if (!guard.ok) return guard.result;
 
-  const saved = await insertLead({
-    type: lead.kind === "erasure" ? "account_deletion" : "grievance",
-    name: lead.name,
-    phone_e164: guard.phoneE164,
-    email: lead.email || null,
-    details: { kind: lead.kind, message: lead.message, reference: lead.reference ?? null },
-    ...common(lead),
-  });
-  return saved
-    ? { ok: true, reference: referenceFor(saved.id), served: true }
-    : { ok: false, reason: "unavailable" };
+  return saveAndNotify(
+    {
+      type: lead.kind === "erasure" ? "account_deletion" : "grievance",
+      name: lead.name,
+      phone_e164: guard.phoneE164,
+      email: lead.email || null,
+      details: { kind: lead.kind, message: lead.message, reference: lead.reference ?? null },
+      ...common(lead),
+    },
+    null,
+  );
 }

@@ -1,8 +1,12 @@
 import "server-only";
 
+import { cacheLife } from "next/cache";
+
 import { priceQuote } from "@truckbuck/pricing";
 import type { EstimateRequest, EstimateResponse } from "@truckbuck/types";
 import { toISTDateKey } from "@truckbuck/utils";
+
+import { log } from "@/server/log";
 
 import { getCatalog, getRateCard } from "./catalog";
 import {
@@ -88,7 +92,19 @@ export async function computeEstimate(
   } catch (error) {
     if (error instanceof NoRouteError) return { ok: false, error: "no_route" };
     if (error instanceof GeoUnavailableError) return { ok: false, error: "unavailable" };
-    console.error("computeEstimate failed", error);
+    log.error("computeEstimate failed", error);
     return { ok: false, error: "unavailable" };
   }
+}
+
+/**
+ * computeEstimate for GET /api/estimate, cached 5 minutes per identical
+ * request (the CDN caches the same response by URL). Errors aren't cached.
+ */
+export async function computeEstimateCached(request: EstimateRequest): Promise<EstimateOutcome> {
+  "use cache";
+  cacheLife({ stale: 60, revalidate: 300, expire: 600 });
+  const outcome = await computeEstimate(request);
+  if (!outcome.ok) cacheLife("seconds");
+  return outcome;
 }

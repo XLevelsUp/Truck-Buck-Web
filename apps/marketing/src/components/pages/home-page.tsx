@@ -11,6 +11,7 @@ import { LiveCountersSection } from "@/components/live-counters";
 import { getContent } from "@/content";
 import { htmlLang, type Locale, localizedHref } from "@/i18n/locales";
 import { indexableLocales } from "@/i18n/publishing";
+import type { Assignment } from "@/lib/experiments";
 import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo";
 import { getCatalog, getFaqs, getSocialProof } from "@/server/catalog";
@@ -45,7 +46,13 @@ export function homeMetadata(locale: Locale): Metadata {
 }
 
 /** / , /hi and /ta. */
-export async function HomePage({ locale }: { locale: Locale }) {
+export async function HomePage({
+  locale,
+  assignment,
+}: {
+  locale: Locale;
+  assignment?: Assignment;
+}) {
   const content = getContent(locale);
   const [catalog, dbFaqs, social] = await Promise.all([
     getCatalog(),
@@ -58,7 +65,7 @@ export async function HomePage({ locale }: { locale: Locale }) {
 
   return (
     <>
-      <Hero labels={labels} config={config} locale={locale} />
+      <Hero labels={labels} config={config} locale={locale} assignment={assignment} />
       <TrustStrip locale={locale} />
       <HowItWorks locale={locale} />
       <TruckCarousel trucks={catalog.trucks} locale={locale} />

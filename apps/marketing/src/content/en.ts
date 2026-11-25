@@ -125,7 +125,8 @@ export const en = {
       submit: "Get a callback in {minutes} min",
       submitNoSla: "Request a callback",
       whatsapp: "Continue on WhatsApp",
-      consent: "We'll use your number only to call you about this request. See our",
+      consent:
+        "We'll use your number only to call you or message you on WhatsApp about this request. See our",
       privacyLink: "Privacy Policy",
       successTitle: "Request received",
       successBody: "Reference {reference}. We'll call {phone} within {minutes} minutes.",
@@ -784,7 +785,8 @@ export const en = {
     phoneError: "Enter a 10-digit mobile number, like 98765 43210.",
     cityError: "Enter your city.",
     required: "Fill in this field.",
-    consent: "We'll use these details only to contact you about this request. See our",
+    consent:
+      "We'll use these details only to contact you (by phone or WhatsApp) about this request. See our",
     privacyLink: "Privacy Policy",
     submitting: "Sending…",
     errors: {
@@ -1373,7 +1375,7 @@ export const en = {
     title: "Privacy Policy",
     description:
       "What personal data TruckBuck collects, why, how long we keep it and your rights under the DPDP Act, 2023.",
-    lastUpdated: "2026-11-24",
+    lastUpdated: "2026-11-25",
     intro:
       "This notice explains what personal data {legalName} (“TruckBuck”, “we”) collects through truckbuck.in and the TruckBuck driver app, why we collect it, how long we keep it, and the rights you have under the Digital Personal Data Protection Act, 2023 (the DPDP Act).",
     sections: [
@@ -1393,7 +1395,9 @@ export const en = {
           "Transporter applications: owner name, mobile number, city, fleet size, truck types, home base and preferred routes. During verification, the documents you send us (RC, insurance, permit, PAN, GST certificate, bank details and driver licences), to verify you and pay you.",
           "Driver app: name, mobile number, licence details, trip records and the phone's location while a trip is active, to show the trip to the shipper and transporter and to resolve disputes.",
           "Technical data: a one-way hash of your IP address (for rate limiting), the page you came from and campaign tags, to protect the site from abuse and to see which channels bring enquiries.",
-          "Cookies: a language-preference cookie (tb_locale) and the security cookies our bot-protection provider, Cloudflare Turnstile, needs. We don't use advertising or analytics cookies.",
+          "Technical data, continued: the page you first landed on and your first referring site, kept in your browser for up to 90 days and sent to us only with a form you submit; and an anonymous log of fare estimates (city-level places, truck type and fare, with no name, number or device identifier) to see where demand is.",
+          "Cookies we always use: a language-preference cookie (tb_locale), a bot-check cookie (tb_h, 30 minutes), an A/B-test cookie that remembers which version of a page you see (tb_exp, 90 days, no identifier), your cookie choice (tb_consent), and the security cookies Cloudflare Turnstile needs.",
+          "Analytics cookies, only if you accept them: Google Analytics (through Google Tag Manager) and Microsoft Clarity measure how pages are used, with a random analytics ID (tb_cid). Clarity records page interactions with everything typed into forms hidden. We never send your name, phone number or address to these tools, and we don't use advertising cookies. You can change your choice any time with Cookie settings at the bottom of every page.",
         ],
       },
       {
@@ -1409,7 +1413,7 @@ export const en = {
         paragraphs: ["We don't sell personal data. We share it only with:"],
         items: [
           "the transporter and driver assigned to your booking, and only what they need for the trip;",
-          "service providers who process data for us under contract: website hosting (Vercel), database (Supabase), maps (Google Maps Platform), bot protection (Cloudflare) and WhatsApp messaging (Meta);",
+          "service providers who process data for us under contract: website hosting (Vercel), database (Supabase), maps (Google Maps Platform), bot protection (Cloudflare), WhatsApp messaging (Meta), email (Resend), our lead spreadsheet (Google Workspace), error monitoring (Sentry) and, only with your consent, analytics (Google Analytics, Microsoft Clarity);",
           "authorities, when the law requires it.",
         ],
       },
@@ -1609,6 +1613,24 @@ export const en = {
   },
   footer: {
     rights: "All rights reserved.",
+  },
+  consent: {
+    label: "Cookie choice",
+    body: "Can we use analytics cookies (Google Analytics) to learn which pages help people book trucks? We never send your name, phone number or address.",
+    accept: "Accept analytics",
+    reject: "No thanks",
+    privacy: "Privacy policy",
+    settings: "Cookie settings",
+  },
+  exitPrompt: {
+    title: "Get your quote on WhatsApp",
+    body: "Leaving already? Send us your route and truck on WhatsApp and we'll reply with a fare.",
+    cta: "Get my quote on WhatsApp",
+    close: "Not now",
+    message: "Hi TruckBuck, I'd like a truck quote.",
+  },
+  experiments: {
+    ctaBook: "Book a truck",
   },
 } as const;
 

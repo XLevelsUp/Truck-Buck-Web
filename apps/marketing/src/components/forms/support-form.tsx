@@ -19,6 +19,7 @@ import {
   Consent,
   FormError,
   Honeypot,
+  markLeadSent,
   SuccessPanel,
   Textarea,
   useBotCheck,
@@ -109,8 +110,10 @@ export function SupportForm({
               reference: text("reference") || undefined,
             });
       const outcome = await submit.catch((): LeadResult => ({ ok: false, reason: "unavailable" }));
-      if (outcome.ok) setSubmittedPhone(formatIndianMobile(values.phone) ?? values.phone);
-      else if (outcome.fieldErrors) setErrors(outcome.fieldErrors);
+      if (outcome.ok) {
+        setSubmittedPhone(formatIndianMobile(values.phone) ?? values.phone);
+        markLeadSent();
+      } else if (outcome.fieldErrors) setErrors(outcome.fieldErrors);
       setResult(outcome);
     });
   }
@@ -133,7 +136,13 @@ export function SupportForm({
     result && !result.ok && !result.fieldErrors ? forms.errors[result.reason] : null;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="grid gap-5" aria-busy={pending || undefined}>
+    <form
+      data-clarity-mask="true"
+      onSubmit={onSubmit}
+      noValidate
+      className="grid gap-5"
+      aria-busy={pending || undefined}
+    >
       <ChoiceChips
         legend={mode === "contact" ? s.topic : s.kind}
         name={choiceName}

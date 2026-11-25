@@ -3,6 +3,7 @@ import { z } from "zod";
 import { allowRequest, clientIp } from "@/server/abuse";
 import { GeoUnavailableError, reverseGeocode } from "@/server/geo";
 import { badRequest, json, tooManyRequests, unavailable } from "@/server/http";
+import { log } from "@/server/log";
 
 // India's bounding box, with margin.
 const QuerySchema = z.object({
@@ -20,7 +21,7 @@ export async function GET(request: Request) {
     const place = await reverseGeocode(parsed.data.lat, parsed.data.lng);
     return place ? json({ place }) : json({ error: "not_found" }, { status: 404 });
   } catch (error) {
-    if (!(error instanceof GeoUnavailableError)) console.error("reverse geocode failed", error);
+    if (!(error instanceof GeoUnavailableError)) log.error("reverse geocode failed", error);
     return unavailable();
   }
 }

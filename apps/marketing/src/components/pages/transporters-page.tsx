@@ -20,7 +20,7 @@ import { type Content, getContent } from "@/content";
 import { vettingTimeline } from "@/content/features";
 import { env } from "@/env";
 import { type Locale, localizedHref } from "@/i18n/locales";
-import { heroCopy } from "@/lib/experiments";
+import { heroCopy, type HeroVariant } from "@/lib/experiments";
 import { fill } from "@/lib/format";
 import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo";
@@ -40,10 +40,17 @@ export function transportersMetadata(locale: Locale): Metadata {
 }
 
 /** /transporters, /hi/transporters, /ta/transporters. */
-export async function TransportersPage({ locale }: { locale: Locale }) {
+export async function TransportersPage({
+  locale,
+  heroVariant,
+}: {
+  locale: Locale;
+  /** A/B hero variant (English only). */
+  heroVariant?: HeroVariant | undefined;
+}) {
   const content = getContent(locale);
   const t = content.transporters;
-  const hero = heroCopy("transporters", locale);
+  const hero = heroCopy("transporters", locale, heroVariant);
   const f = content.features;
   const [catalog, fee] = await Promise.all([getCatalog(), getSiteConfig("transporter.fee")]);
 

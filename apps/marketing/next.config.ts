@@ -37,6 +37,9 @@ const nextConfig: NextConfig = {
     inlineCss: true,
     // Two root layouts ((en), [locale]) → unmatched URLs use app/global-not-found.tsx.
     globalNotFound: true,
+    // Subresource Integrity: every <script src> carries a sha256 hash, so a
+    // tampered chunk on the CDN is refused by the browser (see SECURITY.md).
+    sri: { algorithm: "sha256" },
   },
   turbopack: {
     root: join(import.meta.dirname, "../.."),
@@ -55,7 +58,10 @@ const nextConfig: NextConfig = {
     return Promise.resolve([
       {
         source: "/:path*",
-        headers: securityHeaders({ isDev: process.env.NODE_ENV === "development" }),
+        headers: securityHeaders({
+          isDev: process.env.NODE_ENV === "development",
+          gtm: Boolean(process.env.NEXT_PUBLIC_GTM_ID),
+        }),
       },
     ]);
   },

@@ -4,7 +4,7 @@ import { LoopFrame } from "@/components/visuals/loop-frame";
 import { PhoneMockup } from "@/components/visuals/phone-mockup";
 import { getContent } from "@/content";
 import type { Locale } from "@/i18n/locales";
-import { heroCopy } from "@/lib/experiments";
+import { type Assignment, CONTROL, heroCopy } from "@/lib/experiments";
 
 /**
  * Above the fold at 360×740: H1 (the LCP element — text, no image), one-line
@@ -15,13 +15,17 @@ export function Hero({
   labels,
   config,
   locale = "en",
+  assignment = CONTROL,
 }: {
   labels: WidgetLabels;
   config: WidgetConfig;
   locale?: Locale;
+  /** A/B assignment (English only; see src/lib/experiments.ts). */
+  assignment?: Assignment | undefined;
 }) {
-  const { home, common } = getContent(locale);
-  const hero = heroCopy("home", locale);
+  const { home, common, experiments } = getContent(locale);
+  const hero = heroCopy("home", locale, assignment.hero);
+  const submit = assignment.cta === "book_truck" ? experiments.ctaBook : hero.cta;
   return (
     <section
       aria-labelledby="hero-title"
@@ -48,8 +52,10 @@ export function Hero({
         >
           <h2 className="mb-4 text-xl font-bold">{home.widget.title}</h2>
           <EstimateWidget
-            labels={{ ...labels, widget: { ...labels.widget, submit: hero.cta } }}
+            labels={{ ...labels, widget: { ...labels.widget, submit } }}
             config={config}
+            truckFirst={assignment.widget_order === "truck_first"}
+            whatsappFirst={assignment.primary_action === "whatsapp"}
           />
         </div>
       </div>

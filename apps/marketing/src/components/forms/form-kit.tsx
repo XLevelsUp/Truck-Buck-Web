@@ -1,6 +1,13 @@
 "use client";
 
-import { type ComponentProps, type ReactNode, useCallback, useRef, useState } from "react";
+import {
+  type ComponentProps,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
 import { CheckCircle2, MessageCircle } from "lucide-react";
 
@@ -8,17 +15,41 @@ import { Button } from "@truckbuck/ui/button";
 import { fieldControlVariants } from "@truckbuck/ui/input";
 import { cn } from "@truckbuck/ui/lib/utils";
 
+import type { TurnstileAction } from "@/lib/turnstile-actions";
+
 import { Turnstile } from "./turnstile";
 
 const TOKEN_WAIT_MS = 10_000;
 
+/** Calls `onArm` the first time someone focuses or touches the surrounding form. */
+function ArmOnFormUse({ onArm }: { onArm: () => void }) {
+  const anchor = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    const form = anchor.current?.closest("form");
+    if (!form) return;
+    form.addEventListener("focusin", onArm, { once: true });
+    form.addEventListener("pointerdown", onArm, { once: true });
+    return () => {
+      form.removeEventListener("focusin", onArm);
+      form.removeEventListener("pointerdown", onArm);
+    };
+  }, [onArm]);
+  return <span ref={anchor} hidden />;
+}
+
 /**
- * Turnstile token for a form: renders the (usually invisible) widget and
- * lets submit wait briefly for a token if the user was faster than the check.
+ * Turnstile token for a form. Cloudflare's script loads only once someone
+ * starts using the form (never on page load: it is third-party JS on the
+ * critical path otherwise); submit waits briefly for a token if needed.
  */
-export function useBotCheck(siteKey: string | null, action: string) {
+export function useBotCheck(siteKey: string | null, action: TurnstileAction) {
+  const [armed, setArmed] = useState(false);
+  // Tokens are single-use: once one is handed to a submit, the widget is
+  // re-rendered (new key) so a retry after an error gets a fresh token.
+  const [generation, setGeneration] = useState(0);
   const token = useRef<string | null>(null);
   const waiters = useRef<((value: string | null) => void)[]>([]);
+  const arm = useCallback(() => setArmed(true), []);
 
   const onToken = useCallback((value: string | null) => {
     token.current = value;
@@ -28,17 +59,33 @@ export function useBotCheck(siteKey: string | null, action: string) {
     }
   }, []);
 
-  const getToken = useCallback((): Promise<string | undefined> => {
-    if (!siteKey || token.current) return Promise.resolve(token.current ?? undefined);
-    return new Promise((resolve) => {
-      waiters.current.push((value) => resolve(value ?? undefined));
-      window.setTimeout(() => resolve(token.current ?? undefined), TOKEN_WAIT_MS);
-    });
+  const getToken = useCallback(async (): Promise<string | undefined> => {
+    if (!siteKey) return undefined;
+    setArmed(true);
+    const value =
+      token.current ??
+      (await new Promise<string | null>((resolve) => {
+        waiters.current.push(resolve);
+        window.setTimeout(() => resolve(token.current), TOKEN_WAIT_MS);
+      }));
+    if (value) {
+      token.current = null;
+      setGeneration((g) => g + 1);
+    }
+    return value ?? undefined;
   }, [siteKey]);
 
-  const widget = siteKey ? <Turnstile siteKey={siteKey} onToken={onToken} action={action} /> : null;
+  const widget = siteKey ? (
+    armed ? (
+      <Turnstile key={generation} siteKey={siteKey} onToken={onToken} action={action} />
+    ) : (
+      <ArmOnFormUse onArm={arm} />
+    )
+  ) : null;
   return { widget, getToken };
 }
+
+export { markLeadSent } from "@/lib/lead-sent";
 
 /** Hidden from people and assistive tech; bots fill it. */
 export function Honeypot() {
@@ -189,11 +236,15 @@ export function ChoiceChips({
           </label>
         ))}
       </div>
-      {error ? (
-        <p id={errorId} className="text-sm font-medium text-danger">
-          {error}
-        </p>
-      ) : null}
+      {/* Live region always present (display: contents, so no layout box) so the
+          error is announced as it appears, not only when focus reaches the field. */}
+      <div aria-live="polite" aria-atomic="true" className="contents">
+        {error ? (
+          <p id={errorId} className="text-sm font-medium text-danger">
+            {error}
+          </p>
+        ) : null}
+      </div>
     </fieldset>
   );
 }

@@ -12,6 +12,7 @@ import { formatIndianMobile, normalizeIndianMobile } from "@truckbuck/utils";
 
 import { submitTransporterLead } from "@/app/actions/leads";
 import type { Content } from "@/content";
+import { track } from "@/lib/analytics";
 import { fill } from "@/lib/format";
 
 import { readUtm } from "./attribution";
@@ -20,6 +21,7 @@ import {
   Consent,
   FormError,
   Honeypot,
+  markLeadSent,
   SuccessPanel,
   Textarea,
   useBotCheck,
@@ -186,7 +188,10 @@ export function TransporterApplication({
       setErrors(stepErrors);
       const first = Object.keys(stepErrors)[0];
       if (first) focusField(form, first);
-      else goTo(1);
+      else {
+        track("transporter_step_completed", { step: 1 });
+        goTo(1);
+      }
       return;
     }
 
@@ -222,6 +227,9 @@ export function TransporterApplication({
 
       if (outcome.ok) {
         writeStorage(null);
+        track("transporter_step_completed", { step: 2 });
+        track("transporter_submitted", { fleet_size: values.fleetSize });
+        markLeadSent();
         setSubmittedPhone(formatIndianMobile(values.phone) ?? values.phone);
       } else if (outcome.fieldErrors) {
         setErrors(outcome.fieldErrors);
@@ -260,6 +268,7 @@ export function TransporterApplication({
 
   return (
     <form
+      data-clarity-mask="true"
       key={formKey}
       ref={formRef}
       onSubmit={onSubmit}

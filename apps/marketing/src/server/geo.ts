@@ -6,7 +6,7 @@ import { serverEnv } from "@/env.server";
 
 import { getCatalog } from "./catalog";
 import type { ServiceArea } from "./catalog-types";
-import { getSupabase } from "./supabase";
+import { siteRpc } from "./supabase";
 
 /*
  * Geo lookups behind our own API routes so the Google key never reaches the
@@ -261,22 +261,16 @@ export async function routeInfo(from: PlaceDetails, to: PlaceDetails): Promise<R
     return { distanceKm: Math.round(km * 10) / 10, durationMinutes: Math.round((km / 45) * 60) };
   }
 
-  const db = getSupabase();
-  if (db) {
-    const { data } = await db
-      .from("distance_cache")
-      .select("distance_m,duration_s,fetched_at")
-      .eq("origin_id", from.placeId)
-      .eq("destination_id", to.placeId)
-      .gte("fetched_at", new Date(Date.now() - 30 * 86_400_000).toISOString())
-      .maybeSingle();
-    if (data) {
-      const row = data as { distance_m: number; duration_s: number };
-      return {
-        distanceKm: row.distance_m / 1000,
-        durationMinutes: Math.round(row.duration_s / 60),
-      };
-    }
+  const cached = await siteRpc<{ distance_m: number; duration_s: number }[]>("site_distance_get", {
+    p_origin: from.placeId,
+    p_destination: to.placeId,
+  });
+  const cachedRow = cached?.data?.[0];
+  if (cachedRow) {
+    return {
+      distanceKm: cachedRow.distance_m / 1000,
+      durationMinutes: Math.round(cachedRow.duration_s / 60),
+    };
   }
 
   type Element = { distanceMeters?: number; duration?: string; condition?: string };
@@ -299,16 +293,13 @@ export async function routeInfo(from: PlaceDetails, to: PlaceDetails): Promise<R
     throw new NoRouteError();
   }
   const durationS = Number.parseInt(element.duration ?? "0", 10);
-  if (db) {
-    await db.from("distance_cache").upsert({
-      origin_id: from.placeId,
-      destination_id: to.placeId,
-      distance_m: element.distanceMeters,
-      duration_s: durationS,
-      provider: "google-routes",
-      fetched_at: new Date().toISOString(),
-    });
-  }
+  await siteRpc("site_distance_put", {
+    p_origin: from.placeId,
+    p_destination: to.placeId,
+    p_distance_m: element.distanceMeters,
+    p_duration_s: durationS,
+    p_provider: "google-routes",
+  });
   return { distanceKm: element.distanceMeters / 1000, durationMinutes: Math.round(durationS / 60) };
 }
 
@@ -340,23 +331,17 @@ export async function areaRoute(
   }
   const originId = `area:${from.slug}`;
   const destinationId = `area:${to.slug}`;
-  const db = getSupabase();
-  if (db) {
-    const { data } = await db
-      .from("distance_cache")
-      .select("distance_m,duration_s")
-      .eq("origin_id", originId)
-      .eq("destination_id", destinationId)
-      .gte("fetched_at", new Date(Date.now() - 30 * 86_400_000).toISOString())
-      .maybeSingle();
-    if (data) {
-      const row = data;
-      return {
-        distanceKm: row.distance_m / 1000,
-        durationMinutes: Math.round(row.duration_s / 60),
-        source: "google",
-      };
-    }
+  const cached = await siteRpc<{ distance_m: number; duration_s: number }[]>("site_distance_get", {
+    p_origin: originId,
+    p_destination: destinationId,
+  });
+  const cachedRow = cached?.data?.[0];
+  if (cachedRow) {
+    return {
+      distanceKm: cachedRow.distance_m / 1000,
+      durationMinutes: Math.round(cachedRow.duration_s / 60),
+      source: "google",
+    };
   }
   type Element = { distanceMeters?: number; duration?: string; condition?: string };
   const point = (p: { lat: number; lng: number }) => ({
@@ -381,16 +366,13 @@ export async function areaRoute(
     throw new NoRouteError();
   }
   const durationS = Number.parseInt(element.duration ?? "0", 10);
-  if (db) {
-    await db.from("distance_cache").upsert({
-      origin_id: originId,
-      destination_id: destinationId,
-      distance_m: element.distanceMeters,
-      duration_s: durationS,
-      provider: "google-routes",
-      fetched_at: new Date().toISOString(),
-    });
-  }
+  await siteRpc("site_distance_put", {
+    p_origin: originId,
+    p_destination: destinationId,
+    p_distance_m: element.distanceMeters,
+    p_duration_s: durationS,
+    p_provider: "google-routes",
+  });
   return {
     distanceKm: element.distanceMeters / 1000,
     durationMinutes: Math.round(durationS / 60),

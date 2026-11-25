@@ -11,6 +11,7 @@ import { formatIndianMobile, isValidGstin, normalizeIndianMobile } from "@truckb
 
 import { submitBusinessLead } from "@/app/actions/leads";
 import type { Content } from "@/content";
+import { track } from "@/lib/analytics";
 import { fill } from "@/lib/format";
 
 import { readUtm } from "./attribution";
@@ -19,6 +20,7 @@ import {
   Consent,
   FormError,
   Honeypot,
+  markLeadSent,
   SuccessPanel,
   Textarea,
   useBotCheck,
@@ -89,8 +91,11 @@ export function BusinessAccountForm({
         referrer: document.referrer || undefined,
         locale: "en",
       }).catch((): LeadResult => ({ ok: false, reason: "unavailable" }));
-      if (outcome.ok) setSubmittedPhone(formatIndianMobile(phone) ?? phone);
-      else if (outcome.fieldErrors) setErrors(outcome.fieldErrors);
+      if (outcome.ok) {
+        setSubmittedPhone(formatIndianMobile(phone) ?? phone);
+        track("business_enquiry_submitted", {});
+        markLeadSent();
+      } else if (outcome.fieldErrors) setErrors(outcome.fieldErrors);
       setResult(outcome);
     });
   }
@@ -112,7 +117,13 @@ export function BusinessAccountForm({
     result && !result.ok && !result.fieldErrors ? forms.errors[result.reason] : null;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="grid gap-5" aria-busy={pending || undefined}>
+    <form
+      data-clarity-mask="true"
+      onSubmit={onSubmit}
+      noValidate
+      className="grid gap-5"
+      aria-busy={pending || undefined}
+    >
       <div className="grid gap-4 md:grid-cols-2">
         <Field label={f.company} error={errors.company}>
           {(control) => (

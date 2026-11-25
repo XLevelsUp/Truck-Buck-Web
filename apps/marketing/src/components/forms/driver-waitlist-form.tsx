@@ -12,6 +12,7 @@ import { formatIndianMobile, normalizeIndianMobile } from "@truckbuck/utils";
 import { submitDriverWaitlist } from "@/app/actions/leads";
 import type { Content } from "@/content";
 import type { Locale } from "@/i18n/locales";
+import { track } from "@/lib/analytics";
 import { fill } from "@/lib/format";
 
 import { readUtm } from "./attribution";
@@ -19,6 +20,7 @@ import {
   Consent,
   FormError,
   Honeypot,
+  markLeadSent,
   SuccessPanel,
   useBotCheck,
   useFieldErrors,
@@ -84,8 +86,11 @@ export function DriverWaitlistForm({
         referrer: document.referrer || undefined,
         locale,
       }).catch((): LeadResult => ({ ok: false, reason: "unavailable" }));
-      if (outcome.ok) setSubmittedPhone(formatIndianMobile(phone) ?? phone);
-      else if (outcome.fieldErrors) setErrors(outcome.fieldErrors);
+      if (outcome.ok) {
+        setSubmittedPhone(formatIndianMobile(phone) ?? phone);
+        track("driver_waitlist_submitted", {});
+        markLeadSent();
+      } else if (outcome.fieldErrors) setErrors(outcome.fieldErrors);
       setResult(outcome);
     });
   }
@@ -107,7 +112,13 @@ export function DriverWaitlistForm({
     result && !result.ok && !result.fieldErrors ? forms.errors[result.reason] : null;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="grid gap-4" aria-busy={pending || undefined}>
+    <form
+      data-clarity-mask="true"
+      onSubmit={onSubmit}
+      noValidate
+      className="grid gap-4"
+      aria-busy={pending || undefined}
+    >
       <div className="grid gap-4 md:grid-cols-2">
         <Field label={forms.name} error={errors.name}>
           {(control) => (

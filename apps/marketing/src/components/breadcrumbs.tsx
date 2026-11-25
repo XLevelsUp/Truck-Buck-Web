@@ -28,7 +28,7 @@ export function Breadcrumbs({ trail }: { trail: readonly Crumb[] }) {
                   <>
                     <Link
                       href={crumb.path}
-                      className="rounded-sm text-link underline-offset-4 focus-ring hover:underline"
+                      className="inline-flex min-h-6 items-center rounded-sm text-link underline-offset-4 focus-ring hover:underline"
                     >
                       {crumb.name}
                     </Link>

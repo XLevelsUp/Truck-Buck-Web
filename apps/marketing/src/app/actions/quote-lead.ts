@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import { after } from "next/server";
 
 import { type LeadResult, QuoteLeadInputSchema } from "@truckbuck/types";
 import { normalizeIndianMobile } from "@truckbuck/utils";
@@ -8,10 +9,12 @@ import { normalizeIndianMobile } from "@truckbuck/utils";
 import { serverEnv } from "@/env.server";
 import { allowRequest, clientIp, verifyTurnstile } from "@/server/abuse";
 import { computeEstimate } from "@/server/estimate";
-import { getSupabase } from "@/server/supabase";
+import { conversionContext } from "@/server/ga4";
+import { insertLead } from "@/server/leads";
+import { processNewLead } from "@/server/notify";
 
 /** Bump when the consent sentence next to the form changes. */
-const QUOTE_CONSENT_VERSION = "2026-11-quote-v1";
+const QUOTE_CONSENT_VERSION = "2026-11-quote-v2";
 
 function reference(id: string): string {
   return `TB-${id.replace(/-/g, "").slice(0, 6).toUpperCase()}`;
@@ -53,7 +56,8 @@ export async function submitQuoteLead(input: unknown): Promise<LeadResult> {
   const requestHeaders = await headers();
   const ip = clientIp(requestHeaders);
   if (!(await allowRequest("lead", ip))) return { ok: false, reason: "rate_limited" };
-  if (!(await verifyTurnstile(lead.turnstileToken, ip))) return { ok: false, reason: "bot_check" };
+  if (!(await verifyTurnstile(lead.turnstileToken, ip, "quote_lead")))
+    return { ok: false, reason: "bot_check" };
 
   const outcome = await computeEstimate(lead.estimate);
   const estimate = outcome.ok ? outcome.estimate : null;
@@ -84,20 +88,11 @@ export async function submitQuoteLead(input: unknown): Promise<LeadResult> {
     is_test: quote?.sample ?? serverEnv.allowSampleData,
   };
 
-  const db = getSupabase();
-  if (!db) {
-    if (!serverEnv.allowSampleData) return { ok: false, reason: "unavailable" };
-    console.warn("[dev] Supabase not configured — lead not saved:", {
-      ...row,
-      phone_e164: "+91•••",
-    });
-    return { ok: true, reference: "TB-DEV000", served: row.served };
-  }
-
-  const { data, error } = await db.from("leads").insert(row).select("id").single<{ id: string }>();
-  if (error) {
-    console.error("lead insert failed", error.message);
-    return { ok: false, reason: "unavailable" };
-  }
-  return { ok: true, reference: reference(data.id), served: row.served };
+  const saved = await insertLead(row);
+  if (!saved) return { ok: false, reason: "unavailable" };
+  const ref = reference(saved.id);
+  const conversion = conversionContext(requestHeaders.get("cookie"));
+  // Ops alerts, Sheet row, customer WhatsApp ack and GA4 conversion — after the response.
+  after(() => processNewLead(saved.id, ref, row, { ack: "ack", conversion }));
+  return { ok: true, reference: ref, served: row.served };
 }

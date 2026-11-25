@@ -136,13 +136,27 @@ test("mobile drawer opens, traps focus and closes with Escape", async ({ page })
   await expect(menu).toBeFocused();
 });
 
-test("estimate API validates input and never exposes rate cards", async ({ request }) => {
-  expect((await request.post("/api/estimate", { data: { from: "x" } })).status()).toBe(400);
+test("estimate API: validates input, needs the bot check, caches, never exposes rate cards", async ({
+  request,
+}) => {
+  const query = "from=sample:chennai&to=sample:madurai&truck=lcv-17ft&date=2099-01-01";
+  expect((await request.get("/api/estimate?from=x")).status()).toBe(400);
+  // No bot-check cookie yet.
+  const blocked = await request.get(`/api/estimate?${query}`);
+  expect(blocked.status()).toBe(403);
+  expect(await blocked.json()).toEqual({ error: "bot_check" });
 
-  const response = await request.post("/api/estimate", {
-    data: { from: "sample:chennai", to: "sample:madurai", truck: "lcv-17ft", date: "2099-01-01" },
+  // Cloudflare's test keys accept the dummy token outside production.
+  const human = await request.post("/api/human", {
+    data: { token: "XXXX.DUMMY.TOKEN.XXXX" },
+    headers: { "x-forwarded-for": "198.51.100.40" },
   });
+  expect(human.status()).toBe(204);
+  expect(human.headers()["set-cookie"]).toMatch(/tb_h=.*HttpOnly.*SameSite=Strict/i);
+
+  const response = await request.get(`/api/estimate?${query}`);
   expect(response.status()).toBe(200);
+  expect(response.headers()["cache-control"]).toContain("s-maxage=300");
   const body = JSON.stringify(await response.json());
   expect(body).not.toMatch(/km_slabs|kmSlabs|per_km|perKm|baseFare|base_fare/);
 });

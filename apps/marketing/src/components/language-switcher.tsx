@@ -18,6 +18,13 @@ import {
 
 const ONE_YEAR = 60 * 60 * 24 * 365;
 
+/**
+ * Other languages' names ("हिन्दी", "தமிழ்") use the system font: on an English
+ * page, drawing them in our web fonts would download ~170 KB of Noto fonts
+ * for two words. Phones ship Devanagari and Tamil system fonts.
+ */
+const SYSTEM_FONT = { fontFamily: "system-ui, sans-serif" } as const;
+
 /** Stores the visitor's choice for proxy.ts. */
 function remember(locale: Locale) {
   document.cookie = `${LOCALE_COOKIE}=${locale}; path=/; max-age=${ONE_YEAR}; samesite=lax`;
@@ -97,7 +104,10 @@ export function LanguageSwitcher({
                   lang={htmlLang[locale]}
                   aria-current={locale === current ? "true" : undefined}
                   onClick={() => remember(locale)}
-                  className="flex min-h-10 items-center rounded-lg px-3 font-medium focus-ring hover:bg-surface-muted aria-[current=true]:bg-primary-soft aria-[current=true]:font-bold aria-[current=true]:text-primary-soft-foreground"
+                  style={locale === current ? undefined : SYSTEM_FONT}
+                  className={cn(
+                    "flex min-h-10 items-center rounded-lg px-3 font-medium focus-ring hover:bg-surface-muted aria-[current=true]:bg-primary-soft aria-[current=true]:font-bold aria-[current=true]:text-primary-soft-foreground",
+                  )}
                 >
                   {localeNames[locale]}
                 </Link>
@@ -123,7 +133,10 @@ export function LanguageSwitcher({
           lang={htmlLang[locale]}
           aria-current={locale === current ? "true" : undefined}
           onClick={() => remember(locale)}
-          className="inline-flex min-h-9 items-center rounded-full border px-3 font-semibold focus-ring hover:bg-surface-muted aria-[current=true]:border-primary aria-[current=true]:bg-primary aria-[current=true]:text-primary-foreground"
+          style={locale === current ? undefined : SYSTEM_FONT}
+          className={cn(
+            "inline-flex min-h-9 items-center rounded-full border px-3 font-semibold focus-ring hover:bg-surface-muted aria-[current=true]:border-primary aria-[current=true]:bg-primary aria-[current=true]:text-primary-foreground",
+          )}
         >
           {localeNames[locale]}
         </Link>

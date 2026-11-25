@@ -3,6 +3,7 @@ import { z } from "zod";
 import { allowRequest, clientIp } from "@/server/abuse";
 import { autocomplete, GeoUnavailableError } from "@/server/geo";
 import { badRequest, json, tooManyRequests, unavailable } from "@/server/http";
+import { log } from "@/server/log";
 
 const QuerySchema = z.object({
   q: z.string().trim().min(2).max(120),
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
   try {
     return json({ suggestions: await autocomplete(parsed.data.q, parsed.data.session) });
   } catch (error) {
-    if (!(error instanceof GeoUnavailableError)) console.error("autocomplete failed", error);
+    if (!(error instanceof GeoUnavailableError)) log.error("autocomplete failed", error);
     return unavailable();
   }
 }

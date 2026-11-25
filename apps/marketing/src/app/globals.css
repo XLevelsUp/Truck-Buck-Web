@@ -1,11 +1,27 @@
 @import "tailwindcss";
 @import "@truckbuck/ui/styles.css";
 
-/* Wire next/font faces into the design-system font stack (see tokens.ts). */
+/* Wire next/font faces into the design-system font stack (see tokens.ts).
+   The Noto faces join the stack only inside Hindi or Tamil content. Their
+   unicode-ranges include ₹ (U+20B9), which Geist's Latin subset lacks, so
+   listing them globally made every English page with a price download a
+   ~120 KB Devanagari font for one glyph. Elsewhere ₹ uses the system font. */
 :root {
   --tb-font-sans-face: var(--font-geist-sans);
-  --tb-font-devanagari: var(--font-noto-devanagari);
-  --tb-font-tamil: var(--font-noto-tamil);
+  --tb-font-devanagari: system-ui;
+  --tb-font-tamil: system-ui;
+}
+
+@layer base {
+  :where(html[lang|="hi"]) body,
+  :where(body [lang|="hi"]) {
+    font-family: var(--font-geist-sans), var(--font-noto-devanagari), system-ui, sans-serif;
+  }
+
+  :where(html[lang|="ta"]) body,
+  :where(body [lang|="ta"]) {
+    font-family: var(--font-geist-sans), var(--font-noto-tamil), system-ui, sans-serif;
+  }
 }
 
 /* Booking-flow loop (PhoneMockup, How it works): four steps on one 10s clock,

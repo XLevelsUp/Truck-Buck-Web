@@ -6,20 +6,43 @@
  *   - switch to per-request nonces via proxy.ts (forces dynamic rendering —
  *     costs performance on a marketing site), or
  *   - adopt hash-based CSP via `experimental.sri` once it is stable.
- * Revisit before adding any third-party script (analytics, chat widgets).
+ *
+ * With a GTM container configured (NEXT_PUBLIC_GTM_ID), the hosts Google
+ * documents for GTM + GA4, and Microsoft Clarity (session replay, added as a
+ * GTM tag), are allowed. GTM itself loads only after analytics consent.
  */
-export function securityHeaders({ isDev }: { isDev: boolean }) {
+const ANALYTICS = {
+  script: ["https://www.googletagmanager.com", "https://*.clarity.ms"],
+  img: [
+    "https://www.googletagmanager.com",
+    "https://*.google-analytics.com",
+    "https://*.googletagmanager.com",
+    "https://*.clarity.ms",
+    "https://c.bing.com",
+  ],
+  connect: [
+    "https://*.google-analytics.com",
+    "https://*.analytics.google.com",
+    "https://*.googletagmanager.com",
+    "https://*.clarity.ms",
+    "https://c.bing.com",
+  ],
+  frame: ["https://www.googletagmanager.com"],
+};
+
+export function securityHeaders({ isDev, gtm = false }: { isDev: boolean; gtm?: boolean }) {
+  const extra = (list: string[]) => (gtm ? ` ${list.join(" ")}` : "");
   const csp = [
     "default-src 'self'",
     // Cloudflare Turnstile (lead forms only, loaded on demand).
-    `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com${isDev ? " 'unsafe-eval'" : ""}`,
+    `script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com${extra(ANALYTICS.script)}${isDev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob:",
+    `img-src 'self' data: blob:${extra(ANALYTICS.img)}`,
     "font-src 'self'",
     // All Maps traffic goes through our own /api routes.
-    `connect-src 'self'${isDev ? " ws:" : ""}`,
-    // Turnstile challenge + the tap-to-open Google Maps embed.
-    "frame-src https://challenges.cloudflare.com https://www.google.com",
+    `connect-src 'self'${extra(ANALYTICS.connect)}${isDev ? " ws:" : ""}`,
+    // Turnstile challenge + the tap-to-open Google Maps embed (+ GTM preview).
+    `frame-src https://challenges.cloudflare.com https://www.google.com${extra(ANALYTICS.frame)}`,
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

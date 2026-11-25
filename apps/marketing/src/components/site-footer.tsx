@@ -6,10 +6,12 @@ import { formatIndianMobile } from "@truckbuck/utils";
 
 import { getContent } from "@/content";
 import { company } from "@/content/company";
+import { env } from "@/env";
 import { isLocalizedPath, type Locale, localizedHref } from "@/i18n/locales";
 import { getPriceHrefFor, primaryNav, routes } from "@/lib/routes";
 import { whatsappUrl } from "@/lib/whatsapp";
 
+import { CookieSettingsButton } from "./analytics";
 import { AppBadges } from "./app-badges";
 import { LanguageSwitcher } from "./language-switcher";
 import { MissingFact, type NfcRef } from "./missing-fact";
@@ -159,6 +161,11 @@ export function SiteFooter({
           <FooterLink href={routes.terms.path}>{content.nav.terms}</FooterLink>
           <FooterLink href={routes.refundPolicy.path}>{content.nav.refund}</FooterLink>
           <FooterLink href={routes.grievance.path}>{content.nav.grievance}</FooterLink>
+          {env.NEXT_PUBLIC_GTM_ID ? (
+            <li>
+              <CookieSettingsButton label={content.consent.settings} />
+            </li>
+          ) : null}
         </FooterColumn>
       </div>
 

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import type { TurnstileAction } from "@/lib/turnstile-actions";
+
 interface TurnstileApi {
   render: (element: HTMLElement, options: Record<string, unknown>) => string;
   remove: (widgetId: string) => void;
@@ -45,7 +47,7 @@ export function Turnstile({
 }: {
   siteKey: string;
   onToken: (token: string | null) => void;
-  action: string;
+  action: TurnstileAction;
 }) {
   const container = useRef<HTMLDivElement>(null);
   const callback = useRef(onToken);

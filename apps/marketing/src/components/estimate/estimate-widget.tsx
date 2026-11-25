@@ -2,7 +2,7 @@
 
 import { type FormEvent, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, MessageCircle } from "lucide-react";
 
 import type { EstimateRequest, EstimateResponse } from "@truckbuck/types";
 import { Button } from "@truckbuck/ui/button";
@@ -11,8 +11,12 @@ import { Field } from "@truckbuck/ui/field";
 import { Input } from "@truckbuck/ui/input";
 import { formatINR, toISTDateKey } from "@truckbuck/utils";
 
+import { currentPage, track } from "@/lib/analytics";
 import { fill } from "@/lib/format";
+import { markLeadSent } from "@/lib/lead-sent";
 
+import { readUtm } from "../forms/attribution";
+import { Turnstile } from "../forms/turnstile";
 import type { WidgetConfig, WidgetLabels } from "./labels";
 import { type Place, PlaceField } from "./place-field";
 import { TruckPicker } from "./truck-picker";
@@ -63,6 +67,10 @@ interface EstimateWidgetProps {
   preselectedTruck?: string;
   /** Places filled in up front, e.g. on /truck-booking pages ("area:<slug>" ids). */
   prefill?: { from?: Place; to?: Place };
+  /** A/B (widget_order): truck type before the route fields. DOM order, so focus order follows. */
+  truckFirst?: boolean;
+  /** A/B (primary_action): after the fare, lead with WhatsApp instead of the callback form. */
+  whatsappFirst?: boolean;
 }
 
 // Result + lead step load only once someone asks for a price: they are not
@@ -73,6 +81,25 @@ const loadLeadForm = () => import("./lead-form");
 const EstimateResult = dynamic(() => loadResult().then((m) => m.EstimateResult), { ssr: false });
 const LeadForm = dynamic(() => loadLeadForm().then((m) => m.LeadForm), { ssr: false });
 
+/** Waits this long for an invisible Turnstile token before giving up. */
+const TOKEN_WAIT_MS = 10_000;
+/** Client-side memory of the 30-minute bot-check cookie (slightly shorter). */
+const HUMAN_TTL_MS = 25 * 60_000;
+let humanUntil = 0;
+
+/** Anonymous estimate log (funnel + unserved demand): places are cut to city level server-side. */
+function logEstimate(body: Record<string, unknown>) {
+  const utm = readUtm();
+  const payload = JSON.stringify({
+    ...body,
+    utm: { utm_source: utm.utm_source, utm_medium: utm.utm_medium, utm_campaign: utm.utm_campaign },
+    page: window.location.pathname,
+  });
+  if (!navigator.sendBeacon("/api/events", new Blob([payload], { type: "application/json" }))) {
+    void fetch("/api/events", { method: "POST", body: payload, keepalive: true }).catch(() => {});
+  }
+}
+
 const EMPTY: InitialState = { from: null, to: null, truck: null, date: null };
 const noopSubscribe = () => () => {};
 
@@ -82,7 +109,14 @@ const noopSubscribe = () => () => {};
  * and price themselves. Reading location after hydration (instead of
  * useSearchParams + Suspense) avoids rendering the widget twice on load.
  */
-export function EstimateWidget({ labels, config, preselectedTruck, prefill }: EstimateWidgetProps) {
+export function EstimateWidget({
+  labels,
+  config,
+  preselectedTruck,
+  prefill,
+  truckFirst = false,
+  whatsappFirst = false,
+}: EstimateWidgetProps) {
   const w = labels.widget;
   const today = useTodayIST();
   const search = useSyncExternalStore(
@@ -116,6 +150,46 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
   const [estimate, setEstimate] = useState<EstimateResponse | null>(null);
   const [request, setRequest] = useState<EstimateRequest | null>(null);
 
+  // Bot check: Turnstile mounts on first use of the form (or a shared link),
+  // never on page load. One solve sets a 30-minute cookie for /api/estimate.
+  const [botCheck, setBotCheck] = useState({ armed: false, attempt: 0 });
+  const token = useRef<string | null>(null);
+  const waiters = useRef<((token: string | null) => void)[]>([]);
+  const arm = () => setBotCheck((b) => (b.armed ? b : { ...b, armed: true }));
+  function onToken(value: string | null) {
+    token.current = value;
+    if (value) {
+      waiters.current.forEach((resolve) => resolve(value));
+      waiters.current = [];
+    }
+  }
+
+  async function ensureHuman(force = false): Promise<boolean> {
+    if (!config.turnstileSiteKey) return true;
+    if (!force && Date.now() < humanUntil) return true;
+    if (force) {
+      token.current = null;
+      setBotCheck((b) => ({ armed: true, attempt: b.attempt + 1 }));
+    } else arm();
+    const value =
+      token.current ??
+      (await new Promise<string | null>((resolve) => {
+        waiters.current.push(resolve);
+        window.setTimeout(() => resolve(token.current), TOKEN_WAIT_MS);
+      }));
+    if (!value) return false;
+    token.current = null; // single use
+    const response = await fetch("/api/human", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: value }),
+    });
+    if (!response.ok) return false;
+    humanUntil = Date.now() + HUMAN_TTL_MS;
+    return true;
+  }
+
+  const started = useRef(false);
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const resultRegion = useRef<HTMLDivElement>(null);
 
@@ -133,11 +207,23 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
     setStatus("loading");
     setRequestError(null);
     try {
-      const response = await fetch("/api/estimate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
+      const query = new URLSearchParams(
+        Object.entries(body).map(([key, value]) => [key, String(value)]),
+      ).toString();
+      let response: Response | null = null;
+      for (const force of [false, true]) {
+        if (!(await ensureHuman(force))) break;
+        response = await fetch(`/api/estimate?${query}`);
+        // Cookie expired or was cleared: solve once more, then retry.
+        if (response.status !== 403) break;
+        humanUntil = 0;
+      }
+      if (!response) {
+        setRequestError("bot_check");
+        setEstimate(null);
+        setStatus("idle");
+        return;
+      }
       const data = (await response.json().catch(() => ({}))) as {
         estimate?: EstimateResponse;
         error?: string;
@@ -145,6 +231,17 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
       if (!response.ok || !data.estimate) {
         const key = (data.error ??
           (response.status === 429 ? "rate_limited" : "unavailable")) as ErrorKey;
+        track("estimate_failed", { reason: key, truck: next.truck });
+        // Demand we couldn't price (not abuse/limits): kept for the unserved-routes report.
+        if (!["rate_limited", "bot_check", "invalid"].includes(key)) {
+          logEstimate({
+            outcome: "failed",
+            reason: key,
+            from: { label: next.from.label },
+            to: { label: next.to.label },
+            truck: next.truck,
+          });
+        }
         setRequestError(key in labels.errors ? key : "unavailable");
         setEstimate(null);
         setStatus("idle");
@@ -153,6 +250,30 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
       setEstimate(data.estimate);
       setRequest(body);
       setStatus("done");
+      const shown = data.estimate;
+      const rupees = (paise: number | undefined) =>
+        paise === undefined ? null : Math.round(paise / 100);
+      track("estimate_shown", {
+        distance_km: shown.distanceKm,
+        truck: shown.truck.slug,
+        fare_min: rupees(shown.quote?.fare.minPaise),
+        fare_max: rupees(shown.quote?.fare.maxPaise),
+        served: shown.served,
+      });
+      logEstimate({
+        outcome: "shown",
+        served: shown.served,
+        from: { label: shown.from.label, lat: shown.from.lat, lng: shown.from.lng },
+        to: { label: shown.to.label, lat: shown.to.lat, lng: shown.to.lng },
+        truck: shown.truck.slug,
+        distanceKm: Math.round(shown.distanceKm),
+        ...(shown.quote
+          ? {
+              fareMin: Math.round(shown.quote.fare.minPaise / 100),
+              fareMax: Math.round(shown.quote.fare.maxPaise / 100),
+            }
+          : {}),
+      });
 
       // Shareable state: /?from=&to=&truck=&date= (no personal data).
       const url = new URL(window.location.href);
@@ -172,6 +293,7 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
         resultHeading.current?.focus({ preventScroll: true });
       });
     } catch {
+      track("estimate_failed", { reason: "network", truck: next.truck });
       setRequestError("network");
       setStatus("idle");
     }
@@ -185,6 +307,10 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
     void Promise.all([fetchPlace(fromId), fetchPlace(toId)]).then(([a, b]) => {
       if (cancelled) return;
       if (a) setFrom(a);
+      if (a && b) {
+        track("estimate_address_entered", { field: "pickup", method: "link" });
+        track("estimate_address_entered", { field: "drop", method: "link" });
+      }
       if (b) setTo(b);
       if (a && b && truckSlug && config.trucks.some((t) => t.slug === truckSlug)) {
         const today = toISTDateKey(Date.now());
@@ -213,7 +339,13 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0 || !from || !to || !truck) {
       const first = event.currentTarget.querySelector<HTMLElement>(
-        nextErrors.from ? "#estimate-from" : nextErrors.to ? "#estimate-to" : 'input[name="truck"]',
+        truckFirst && nextErrors.truck
+          ? 'input[name="truck"]'
+          : nextErrors.from
+            ? "#estimate-from"
+            : nextErrors.to
+              ? "#estimate-to"
+              : 'input[name="truck"]',
       );
       first?.focus();
       return;
@@ -248,18 +380,41 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
         )}`
       : null;
 
+  const truckPicker = (
+    <TruckPicker
+      trucks={config.trucks}
+      value={truck}
+      onChange={(slug) => {
+        setTruck(slug);
+        track("estimate_truck_selected", { truck: slug });
+        setErrors((e) => ({ ...e, truck: undefined }));
+      }}
+      legend={w.truck}
+      specTemplate={w.truckSpec}
+      error={errors.truck}
+      errorId="estimate-truck-error"
+    />
+  );
+
   return (
     <div className="grid gap-6">
       <form
+        data-clarity-mask="true"
         onSubmit={onSubmit}
         onFocus={() => {
           void loadResult();
           void loadLeadForm();
+          arm();
+          if (!started.current) {
+            started.current = true;
+            track("estimate_started", { page: currentPage() });
+          }
         }}
         noValidate
         className="grid gap-4"
         aria-busy={status === "loading" || undefined}
       >
+        {truckFirst ? truckPicker : null}
         <Field id="estimate-from" label={w.pickup} error={errors.from ?? locateError ?? undefined}>
           {(control) => (
             <PlaceField
@@ -267,6 +422,7 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
               value={from}
               onChange={(place) => {
                 setFrom(place);
+                if (place) track("estimate_address_entered", { field: "pickup", method: "search" });
                 setLocateError(null);
                 setErrors((e) => ({ ...e, from: undefined }));
               }}
@@ -284,6 +440,7 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
               value={to}
               onChange={(place) => {
                 setTo(place);
+                if (place) track("estimate_address_entered", { field: "drop", method: "search" });
                 setErrors((e) => ({ ...e, to: undefined }));
               }}
               placeholder={w.dropPlaceholder}
@@ -292,18 +449,7 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
           )}
         </Field>
 
-        <TruckPicker
-          trucks={config.trucks}
-          value={truck}
-          onChange={(slug) => {
-            setTruck(slug);
-            setErrors((e) => ({ ...e, truck: undefined }));
-          }}
-          legend={w.truck}
-          specTemplate={w.truckSpec}
-          error={errors.truck}
-          errorId="estimate-truck-error"
-        />
+        {truckFirst ? null : truckPicker}
 
         <Field label={w.when}>
           {(control) => (
@@ -362,6 +508,15 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
           </p>
         ) : null}
 
+        {botCheck.armed && config.turnstileSiteKey ? (
+          <Turnstile
+            key={botCheck.attempt}
+            siteKey={config.turnstileSiteKey}
+            action="estimate"
+            onToken={onToken}
+          />
+        ) : null}
+
         <Button type="submit" variant="cta" size="lg" block loading={status === "loading"}>
           {w.submit}
         </Button>
@@ -376,6 +531,19 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
               embedKey={config.mapsEmbedKey}
               headingRef={resultHeading}
             />
+            {whatsappFirst && whatsappHref ? (
+              <Button asChild variant="cta" size="lg" block>
+                <a
+                  href={whatsappHref}
+                  target="_blank"
+                  rel="noopener"
+                  data-track-placement="estimate_primary"
+                  onClick={markLeadSent}
+                >
+                  <MessageCircle aria-hidden="true" /> {labels.lead.whatsapp}
+                </a>
+              </Button>
+            ) : null}
             <LeadForm
               key={`${request.from}-${request.to}-${request.truck}-${request.date}`}
               request={request}
@@ -383,7 +551,7 @@ export function EstimateWidget({ labels, config, preselectedTruck, prefill }: Es
               turnstileSiteKey={config.turnstileSiteKey}
               callbackMinutes={config.callbackMinutes}
               locale={config.locale}
-              whatsappHref={whatsappHref}
+              whatsappHref={whatsappFirst ? null : whatsappHref}
               onReset={reset}
             />
             <Button variant="link" onClick={reset} className="justify-self-start">

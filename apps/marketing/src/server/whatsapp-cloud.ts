@@ -1,43 +1,47 @@
 import "server-only";
 
 import { serverEnv } from "@/env.server";
+import { log } from "@/server/log";
 
 /*
- * WhatsApp Business Cloud API (Meta) — template messages only, which is what
- * business-initiated messages require. Inactive until all three env vars are
- * set; until then sends are logged and reported as "skipped".
+ * WhatsApp Business Cloud API (Meta) — approved template messages only, which
+ * is what business-initiated messages require. Sending needs
+ * WHATSAPP_CLOUD_TOKEN + WHATSAPP_PHONE_NUMBER_ID; each template is optional
+ * and its message is skipped (and logged) until it is configured:
  *
- *   WHATSAPP_CLOUD_TOKEN          permanent system-user token
- *   WHATSAPP_PHONE_NUMBER_ID      the sending number's id
- *   WHATSAPP_TRANSPORTER_TEMPLATE approved template name, one body param: {{1}} = reference
+ *   WHATSAPP_TRANSPORTER_TEMPLATE  {{1}} reference                       (transporter applicant)
+ *   WHATSAPP_ACK_TEMPLATE          {{1}} reference, {{2}} callback window (customer)
+ *   WHATSAPP_OPS_TEMPLATE          {{1}} type, {{2}} reference, {{3}} name, {{4}} phone, {{5}} summary (ops)
  */
 
 export type WhatsappSendResult = "sent" | "skipped" | "failed";
+export type TemplateKind = "transporter" | "ack" | "ops";
 
 const GRAPH_VERSION = "v21.0";
 
-function config() {
-  const cfg = serverEnv.whatsappCloud;
-  return cfg
-    ? { token: cfg.token, phoneNumberId: cfg.phoneNumberId, template: cfg.transporterTemplate }
-    : null;
-}
-
 /** Template language codes Meta uses for our locales. */
 const templateLanguage = { en: "en", hi: "hi", ta: "ta" } as const;
+export type WhatsappLocale = keyof typeof templateLanguage;
 
-/**
- * Sends the "application received" template to a transporter. Never throws:
- * a failed acknowledgement must not fail the application.
- */
-export async function sendTransporterAck(
+/** Meta rejects template params with newlines, tabs or 4+ spaces; keep them short. */
+const param = (text: string) => text.replace(/\s+/g, " ").trim().slice(0, 300) || "-";
+
+/** Sends one template message. Never throws: messaging must not fail a lead. */
+export async function sendTemplate(
+  kind: TemplateKind,
   toE164: string,
-  reference: string,
-  locale: keyof typeof templateLanguage,
+  params: readonly string[],
+  locale: WhatsappLocale = "en",
 ): Promise<WhatsappSendResult> {
-  const cfg = config();
-  if (!cfg) {
-    console.warn("[whatsapp] Cloud API not configured — acknowledgement skipped for", reference);
+  const cfg = serverEnv.whatsappCloud;
+  const template =
+    kind === "transporter"
+      ? cfg?.transporterTemplate
+      : kind === "ack"
+        ? cfg?.ackTemplate
+        : cfg?.opsTemplate;
+  if (!cfg || !template) {
+    log.warn(`[whatsapp] ${kind} template not configured — message skipped`);
     return "skipped";
   }
   try {
@@ -51,21 +55,35 @@ export async function sendTransporterAck(
           to: toE164.replace(/^\+/, ""),
           type: "template",
           template: {
-            name: cfg.template,
+            name: template,
             language: { code: templateLanguage[locale] },
-            components: [{ type: "body", parameters: [{ type: "text", text: reference }] }],
+            components: [
+              {
+                type: "body",
+                parameters: params.map((text) => ({ type: "text", text: param(text) })),
+              },
+            ],
           },
         }),
         signal: AbortSignal.timeout(8_000),
       },
     );
     if (!response.ok) {
-      console.error("[whatsapp] send failed", response.status, await response.text());
+      log.error(`[whatsapp] ${kind} send failed`, response.status, await response.text());
       return "failed";
     }
     return "sent";
   } catch (error) {
-    console.error("[whatsapp] send failed", error);
+    log.error(`[whatsapp] ${kind} send failed`, error);
     return "failed";
   }
+}
+
+/** "Application received" to a transporter applicant. */
+export function sendTransporterAck(
+  toE164: string,
+  reference: string,
+  locale: WhatsappLocale,
+): Promise<WhatsappSendResult> {
+  return sendTemplate("transporter", toE164, [reference], locale);
 }

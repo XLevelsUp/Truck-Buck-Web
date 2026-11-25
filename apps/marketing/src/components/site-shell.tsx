@@ -11,10 +11,13 @@ import { heroCopy } from "@/lib/experiments";
 import { getPriceHrefFor, routes } from "@/lib/routes";
 import { whatsappUrl } from "@/lib/whatsapp";
 
+import { Analytics } from "./analytics";
 import { BottomBar } from "./bottom-bar";
+import { ExitPrompt } from "./exit-prompt";
 import { OrganizationJsonLd } from "./json-ld";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
+import { WebVitals } from "./web-vitals";
 
 /** Metadata shared by every root layout, localised. */
 export function baseMetadata(locale: Locale): Metadata {
@@ -76,6 +79,7 @@ export function SiteShell({ locale, children }: { locale: Locale; children: Reac
   const available = publishedLocales();
   // Only reachable in preview (production hides unreviewed locales); says so on the page.
   const draft = locale !== "en" && !translationReview[locale].reviewed;
+  const exitWhatsapp = whatsappUrl(content.exitPrompt.message);
   return (
     <html lang={htmlLang[locale]} className={fontVariables}>
       <body className="flex min-h-dvh flex-col">
@@ -122,6 +126,16 @@ export function SiteShell({ locale, children }: { locale: Locale; children: Reac
           label={content.nav.quickActions}
         />
         <OrganizationJsonLd />
+        <WebVitals />
+        <Analytics
+          gtmId={env.NEXT_PUBLIC_GTM_ID ?? null}
+          language={htmlLang[locale]}
+          labels={content.consent}
+          privacyHref={routes.privacy.path}
+        />
+        {exitWhatsapp ? (
+          <ExitPrompt whatsappHref={exitWhatsapp} labels={content.exitPrompt} />
+        ) : null}
       </body>
     </html>
   );

@@ -46,6 +46,16 @@ const schema = z.object({
     .string()
     .regex(/^[\w-]+$/)
     .optional(),
+  /** Google Tag Manager container (GA4 etc.). Loaded only after analytics consent. Unset = no GTM. */
+  NEXT_PUBLIC_GTM_ID: z
+    .string()
+    .regex(/^GTM-[A-Z0-9]+$/)
+    .optional(),
+  /** Comma-separated experiment keys to run (see src/lib/experiments.ts). Unset = all run control. */
+  NEXT_PUBLIC_EXPERIMENTS: z
+    .string()
+    .regex(/^[a-z_,]*$/)
+    .optional(),
 });
 
 /**
@@ -75,6 +85,8 @@ const parsed = schema.safeParse({
   NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION:
     process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || undefined,
   NEXT_PUBLIC_BING_SITE_VERIFICATION: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || undefined,
+  NEXT_PUBLIC_GTM_ID: process.env.NEXT_PUBLIC_GTM_ID || undefined,
+  NEXT_PUBLIC_EXPERIMENTS: process.env.NEXT_PUBLIC_EXPERIMENTS || undefined,
 });
 
 if (!parsed.success) {

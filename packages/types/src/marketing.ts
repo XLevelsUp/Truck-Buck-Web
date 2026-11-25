@@ -76,6 +76,10 @@ export const UtmSchema = z
     utm_content: z.string().max(200),
     utm_term: z.string().max(200),
     gclid: z.string().max(200),
+    /** First-touch: the page this visitor first landed on, and where they came from. */
+    landing_path: z.string().max(300),
+    first_referrer: z.string().max(300),
+    first_seen_at: z.string().max(40),
   })
   .partial();
 export type Utm = z.infer<typeof UtmSchema>;
