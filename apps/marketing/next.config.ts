@@ -56,6 +56,10 @@ const nextConfig: NextConfig = {
   },
   headers() {
     return Promise.resolve([
+      // Staging and other Preview deployments: never indexed, whatever the page says.
+      ...(process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production"
+        ? [{ source: "/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] }]
+        : []),
       {
         source: "/:path*",
         headers: securityHeaders({

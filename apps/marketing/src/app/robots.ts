@@ -4,7 +4,15 @@ import { env } from "@/env";
 
 import { sitemapIds } from "./sitemaps/sitemap";
 
+/**
+ * Vercel Preview deployments (including staging) must never be indexed:
+ * block all crawling there. Production and local builds use the real rules.
+ */
+const isNonProductionDeploy =
+  Boolean(process.env.VERCEL_ENV) && process.env.VERCEL_ENV !== "production";
+
 export default function robots(): MetadataRoute.Robots {
+  if (isNonProductionDeploy) return { rules: { userAgent: "*", disallow: "/" } };
   return {
     rules: { userAgent: "*", allow: "/" },
     // The index, plus each per-type sitemap for crawlers that skip indexes.
